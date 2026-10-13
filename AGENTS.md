@@ -33,3 +33,14 @@ book, apply) run only after the prospect confirms.
 - Commit in small logical steps and `git push origin main` after every commit.
 - End every session by rewriting `SESSION.md`: what got done, what's next, open problems. Max 60 lines.
 - Keep this file under 100 lines. Update it when a decision changes, not with progress notes.
+
+## Agent skills
+
+### Issue tracker
+GitHub Issues on AbdulsaboorS/tour-lens, via `gh`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+Default five: needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+Single-context: one `CONTEXT.md` + `docs/adr/` at the root. See `docs/agents/domain.md`.

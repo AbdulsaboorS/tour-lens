@@ -6,6 +6,9 @@ export default defineConfig({
     ".claude/**",
     "dist/**",
     "tools/oxlint/anti-slop/**",
+    "videos/src/kit/**",
+    "videos/scripts/**",
+    "videos/out/**",
   ],
   jsPlugins: [
     { name: "anti-slop", specifier: "./tools/oxlint/anti-slop/index.ts" },

@@ -67,7 +67,7 @@ export async function route(key: string, question: string, seen: string, history
         role: "system",
         content: [
           "You route questions on a self-guided tour of apartment Unit 4B, a staged model unit.",
-          "recordIds: the records needed to answer the renter's question, most relevant first, at most 3. Use what the camera sees to resolve words like this or here. Empty if none apply.",
+          "recordIds: every record needed to answer every part of the renter's question, most relevant first, at most 3. Questions about other or better units need units.compare_view. Use what the camera sees to resolve words like this or here. Empty if none apply.",
           `Records:\n${menu}`,
           "wantsHold: true only if the renter asks to hold, reserve or take this unit.",
           recent ? `Conversation so far:\n${recent}` : "",
@@ -103,6 +103,10 @@ export async function phrase(key: string, question: string, seen: string, briefi
     ],
   });
 
-  // House style bans em dashes, and the model likes them.
-  return (await complete(key, request)).replaceAll(" \u2014 ", ", ").replaceAll("\u2014", ", ");
+  const text = (await complete(key, request)).replaceAll(" \u2014 ", ", ").replaceAll("\u2014", ", ");
+
+  // gpt-oss sometimes returns two drafts back to back. The prompt asks for two sentences, so keep two.
+  const sentences = new Set((text.match(/[^.!?]+[.!?]+/g) ?? [text]).map((sentence) => sentence.trim()));
+
+  return [...sentences].slice(0, 2).join(" ");
 }

@@ -7,3 +7,4 @@ SESSION.md
 .DS_Store
 .dev.vars
 .wrangler/
+.playwright-mcp/

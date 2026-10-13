@@ -118,7 +118,7 @@ export async function phrase(ai: Ai, question: string, seen: string, briefing: s
           "Quote numbers exactly as written, never rounded. Never add a number, brand, price or policy that isn't in the briefing.",
           "Don't do math and don't judge whether something fits. Give the measurement and let the renter compare.",
           "Don't name a brand or model the briefing says the camera contradicts.",
-          "If the briefing has a mismatch that isn't none, start with it: what the records say, then that what you see doesn't match, then that you've flagged it for the leasing team. For example: The records list a stacked dryer here, but I don't see one, so I've flagged it for the leasing team.",
+          "If the briefing has a mismatch that isn't none, start with it: what the records say, then that what you see doesn't match, then that you've flagged it for the leasing team. For example: The records list an LG washer here, but this looks like a different brand, so I've flagged it for the leasing team.",
           "Only if no briefing fact answers the question, say the records don't cover it and offer to text the leasing team.",
           "No lists, no markdown, no greetings.",
         ].join(" "),

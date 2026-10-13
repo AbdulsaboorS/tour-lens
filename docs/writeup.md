@@ -23,7 +23,7 @@ Hold the button, point at something, ask out loud.
 
 1. **Washer:** "What's this, and can I use pods?" The answer comes from the spec sheet and the
    handbook, with both sources shown.
-2. **Records mismatch:** the spec sheet says there's a stacked dryer. The camera doesn't see one.
+2. **Records mismatch:** the spec sheet says it's an LG washer. The camera sees a Samsung.
    The agent says so, and flags it for the leasing team instead of repeating the listing.
 3. **Window:** "What's the view like? Is there a better one?" It answers for 4B, then compares
    against the other open units.
@@ -40,7 +40,7 @@ Hold the button, point at something, ask out loud.
 The model looks and talks. Code decides the facts.
 
 The vision model only routes. It says what it sees, picks which records apply, and answers
-yes/no visual checks ("is a dryer visible?"). Plain code pulls those records, compares the
+yes/no visual checks ("is this washer an LG?"). Plain code pulls those records, compares the
 checks against what the records claim, and hands the speaking model a briefing. The speaking
 model can only use what's in that briefing. Every answer shows its sources. Holds and
 applications never run on the model's say-so.

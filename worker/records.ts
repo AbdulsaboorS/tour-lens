@@ -27,19 +27,12 @@ export const records: PropertyRecord[] = [
     id: "washer.spec",
     title: "In-unit laundry",
     source: "Unit 4B spec sheet, Aug 2026",
-    about: "the washer or laundry closet in unit 4B: brand, model, capacity, dryer",
+    about: "the washer or laundry area in unit 4B: brand, model, capacity",
     facts: [
-      "LG WM3400CW front-load washer, 4.5 cu ft, installed 2023.",
-      "Matching LG electric dryer, stacked above the washer.",
-      "Laundry closet is 32 inches wide with a folding shelf.",
+      "LG WM3400CW washer, 4.5 cu ft, installed 2023.",
+      "Washer repairs are covered by maintenance, same week.",
     ],
     checks: [
-      {
-        key: "dryer_present",
-        question: "Washing machine in frame: true if a clothes dryer is also visible on it or beside it, false if not.",
-        expected: true,
-        claim: "The spec sheet lists a stacked dryer above the washer.",
-      },
       {
         key: "washer_is_lg",
         question: "Washing machine in frame with a readable brand: true if the brand is LG, false if it's another brand.",
@@ -56,7 +49,6 @@ export const records: PropertyRecord[] = [
     facts: [
       "HE detergent only. Pods are fine.",
       "Laundry quiet hours are 10pm to 7am.",
-      "Washer repairs are covered by maintenance, same week.",
     ],
   },
   {

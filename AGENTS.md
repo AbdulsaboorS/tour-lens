@@ -30,6 +30,6 @@ book, apply) run only after the prospect confirms.
 - Fictional property, units and people. Don't imitate EliseAI's branding.
 
 ## Workflow
-- Commit in small logical steps.
+- Commit in small logical steps and `git push origin main` after every commit.
 - End every session by rewriting `SESSION.md`: what got done, what's next, open problems. Max 60 lines.
 - Keep this file under 100 lines. Update it when a decision changes, not with progress notes.

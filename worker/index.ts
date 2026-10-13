@@ -1,17 +1,18 @@
 import { z } from "zod";
 
-import { observe, phrase, speak, toBase64, transcribe, type Observation } from "./models";
+import { phrase, route, type Route } from "./cerebras";
+import { look, speak, toBase64, transcribe, type Sight } from "./workers-ai";
 import { building, records } from "./records";
 
-type Env = { AI: Ai; ACCESS_CODE: string };
+type Env = { AI: Ai; ACCESS_CODE: string; CEREBRAS_API_KEY: string };
 
 const historySchema = z.array(z.object({ question: z.string(), answer: z.string() }));
 
 // Code, not the model, decides which facts are true and whether the camera contradicts them.
-function brief(observation: Observation) {
+function brief(sight: Sight, picked: Route) {
   const mismatches = records.flatMap((record) =>
     (record.checks ?? []).flatMap((check) => {
-      const seen = observation.checks[check.key];
+      const seen = sight.checks[check.key];
 
       return seen !== null && seen !== check.expected ? [{ record, claim: check.claim }] : [];
     }),
@@ -19,7 +20,12 @@ function brief(observation: Observation) {
 
   const contradicted = mismatches.map((mismatch) => mismatch.record);
 
-  const cited = records.filter((record) => observation.recordIds.includes(record.id) || contradicted.includes(record));
+  const cited = records.filter(
+    (record) =>
+      picked.recordIds.includes(record.id) ||
+      contradicted.includes(record) ||
+      (picked.wantsHold && record.id === "unit.hold"),
+  );
 
   const claims = mismatches.map((mismatch) => mismatch.claim);
 
@@ -31,8 +37,8 @@ function brief(observation: Observation) {
       : "Mismatch: none. Do not mention any mismatch.",
   );
 
-  if (observation.wantsHold) {
-    lines.push(`Pending action: a free 48-hour hold on unit ${building.tourUnit}. Ask the renter to tap Confirm on screen. It is not held yet.`);
+  if (picked.wantsHold) {
+    lines.push(`Pending action: a free 48-hour hold on unit ${building.tourUnit}. It is not held yet. Tell the renter you can hold it and ask them to tap Confirm on screen.`);
   }
 
   return {
@@ -48,21 +54,33 @@ async function ask(request: Request, env: Env) {
   const image = z.string().startsWith("data:image/").parse(form.get("image"));
   const history = historySchema.parse(JSON.parse(z.string().parse(form.get("history"))));
 
-  const question = await transcribe(env.AI, audio);
-  const observation = await observe(env.AI, image, question, history.slice(-3));
-  const { briefing, citations, mismatches } = brief(observation);
-  const answer = await phrase(env.AI, question, observation.seen, briefing);
-  const speech = await speak(env.AI, answer);
+  const timings: string[] = [];
+
+  async function timed<T>(name: string, step: Promise<T>) {
+    const start = Date.now();
+    const result = await step;
+
+    timings.push(`${name};dur=${Date.now() - start}`);
+
+    return result;
+  }
+
+  const question = await timed("transcribe", transcribe(env.AI, audio));
+  const sight = await timed("look", look(env.AI, image, question));
+  const picked = await timed("route", route(env.CEREBRAS_API_KEY, question, sight.seen, history.slice(-3)));
+  const { briefing, citations, mismatches } = brief(sight, picked);
+  const answer = await timed("phrase", phrase(env.CEREBRAS_API_KEY, question, sight.seen, briefing));
+  const speech = await timed("speak", speak(env.AI, answer));
 
   return Response.json({
     question,
-    seen: observation.seen,
+    seen: sight.seen,
     answer,
     citations,
     mismatches,
-    pendingHold: observation.wantsHold,
+    pendingHold: picked.wantsHold,
     audio: toBase64(speech),
-  });
+  }, { headers: { "Server-Timing": timings.join(", ") } });
 }
 
 async function hold(env: Env) {

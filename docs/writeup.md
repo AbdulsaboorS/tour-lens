@@ -27,10 +27,10 @@ Hold the button, point at something, ask out loud.
    The agent says so, and flags it for the leasing team instead of repeating the listing.
 3. **Window:** "What's the view like? Is there a better one?" It answers for 4B, then compares
    against the other open units.
-4. **Couch:** "Will a couch like this fit?" It gives the real wall length from the floor plan,
-   instead of eyeballing.
-5. **Desk:** "Can I work from home here?" It gives the internet provider, speeds and the
-   coworking lounge.
+4. **Living room:** "Does this furniture come with it? How big is this room?" It says the unit
+   is staged and leases unfurnished, then gives the real room size from the floor plan.
+5. **Desk:** "Could I work from home here?" It gives the internet speed, the desk nook size and
+   the coworking lounge.
 6. **Hold:** "Hold this for me." It asks first, then holds only after the prospect taps Confirm.
 7. **Recap:** the leasing team gets what the prospect pointed at, what they asked, any records
    flags, and the outcome.
@@ -39,9 +39,10 @@ Hold the button, point at something, ask out loud.
 
 The model looks and talks. Code decides the facts.
 
-The vision model only routes. It says what it sees, picks which records apply, and answers
-yes/no visual checks ("is this washer an LG?"). Plain code pulls those records, compares the
-checks against what the records claim, and hands the speaking model a briefing. The speaking
+Three narrow jobs. A vision model only looks: it names what's in frame and answers yes/no
+checks ("is this washer an LG?"). A language model only routes: it picks which records answer
+the question. Plain code pulls those records, compares the checks against what the records
+claim, and hands the speaking model a briefing. The speaking
 model can only use what's in that briefing. Every answer shows its sources. Holds and
 applications never run on the model's say-so.
 
@@ -91,7 +92,7 @@ Guardrails: answer latency (p50 under 3 seconds), wrong-fact reports, opt-out ra
 
 ## How this demo is built
 
-A phone web app (React) and a Cloudflare Worker. Cloudflare Workers AI handles transcription
-(Whisper), vision routing and phrasing (Mistral Small 3.1) and speech (Deepgram Aura), so the
-demo costs nothing to run. About 4 to 6 seconds per question today. A production version would
+A phone web app (React) and a Cloudflare Worker. Open models do the AI work: Whisper
+transcribes and Mistral Small 3.1 looks (both on Cloudflare Workers AI), and gpt-oss-120b on
+Cerebras routes and phrases. Deepgram Aura speaks. About 5 seconds per question today, with spikes when the free tiers are busy. A production version would
 use a faster realtime model and stream the voice. The property, units and people are made up. The "unit" is my house.

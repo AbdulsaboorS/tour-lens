@@ -22,10 +22,14 @@ book, apply) run only after the prospect confirms.
 - Deliverable: a screen-recorded tour video plus a PM write-up (`docs/writeup.md`), both in
   GitHub. No public live link: the deployed app sits behind an access code.
 - The tour happens in the owner's real home, presented as a fictional unit. Stops: washer
-  (with a planted records mismatch), window, couch, desk setup, then hold the unit and recap.
-- Budget: free for now on Cloudflare Workers AI (Mistral Small 3.1 for vision and phrasing,
-  Whisper for transcription, Deepgram Aura 1 for speech). OpenAI was the first choice and comes
-  back once billing works; the OpenAI version of the model calls is in commit ecf54dc.
+  (planted mismatch: records say LG, it's a Samsung), window, living room, desk, then hold
+  the unit and recap.
+- Models (all free tiers): Whisper transcribes and Mistral Small 3.1 looks (Cloudflare Workers
+  AI), gpt-oss-120b on Cerebras routes and phrases, Deepgram Aura 1 speaks. Cerebras free tier
+  rate-limits hard, so space out test requests. The OpenAI version is in commit ecf54dc.
+- Tour framing: Unit 4B is a staged model unit, so furniture in frame is staging.
+- Video: made by Claude with the product-film skill from real app output on photos of the
+  owner's stops. The owner won't film it. End card says the responses are real.
 - Interaction: push-to-talk. One camera frame plus one utterance per turn.
 - Stack: one TypeScript app (Vite + React) with a Cloudflare Worker API, deployed to Cloudflare.
 - Lint: vendored anti-slop Oxlint rules in `tools/oxlint/anti-slop/`. Code must pass `npm run lint`.

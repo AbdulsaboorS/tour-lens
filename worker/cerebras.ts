@@ -104,5 +104,5 @@ export async function phrase(key: string, question: string, seen: string, briefi
   });
 
   // House style bans em dashes, and the model likes them.
-  return (await complete(key, request)).replaceAll(" — ", ", ").replaceAll("—", ", ");
+  return (await complete(key, request)).replaceAll(" \u2014 ", ", ").replaceAll("\u2014", ", ");
 }

@@ -23,7 +23,9 @@ book, apply) run only after the prospect confirms.
   GitHub. No public live link: the deployed app sits behind an access code.
 - The tour happens in the owner's real home, presented as a fictional unit. Stops: washer
   (with a planted records mismatch), window, couch, desk setup, then hold the unit and recap.
-- Budget: a few dollars of OpenAI (vision, transcription, speech). Keep a spend cap on the key.
+- Budget: free for now on Cloudflare Workers AI (Mistral Small 3.1 for vision and phrasing,
+  Whisper for transcription, Deepgram Aura 1 for speech). OpenAI was the first choice and comes
+  back once billing works; the OpenAI version of the model calls is in commit ecf54dc.
 - Interaction: push-to-talk. One camera frame plus one utterance per turn.
 - Stack: one TypeScript app (Vite + React) with a Cloudflare Worker API, deployed to Cloudflare.
 - Lint: vendored anti-slop Oxlint rules in `tools/oxlint/anti-slop/`. Code must pass `npm run lint`.

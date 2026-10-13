@@ -13,7 +13,7 @@ export type PropertyRecord = {
   source: string;
   about: string;
   facts: string[];
-  check?: VisualCheck;
+  checks?: VisualCheck[];
 };
 
 export const building = {
@@ -33,12 +33,20 @@ export const records: PropertyRecord[] = [
       "Matching LG electric dryer, stacked above the washer.",
       "Laundry closet is 32 inches wide with a folding shelf.",
     ],
-    check: {
-      key: "dryer_present",
-      question: "Is a clothes dryer visible in the frame, stacked on or next to the washer?",
-      expected: true,
-      claim: "The spec sheet lists a stacked dryer above the washer.",
-    },
+    checks: [
+      {
+        key: "dryer_present",
+        question: "Washing machine in frame: true if a clothes dryer is also visible on it or beside it, false if not.",
+        expected: true,
+        claim: "The spec sheet lists a stacked dryer above the washer.",
+      },
+      {
+        key: "washer_is_lg",
+        question: "Washing machine in frame with a readable brand: true if the brand is LG, false if it's another brand.",
+        expected: true,
+        claim: "The spec sheet lists an LG washer.",
+      },
+    ],
   },
   {
     id: "washer.policy",

@@ -20,15 +20,19 @@ Not affiliated with EliseAI. The property, units and people are made up.
 4. A second model call phrases the answer using only that briefing, then it's spoken back.
 5. Holds run only after you tap Confirm. The recap collects everything for the leasing team.
 
+Models run on Cloudflare Workers AI: Mistral Small 3.1 (vision and phrasing), Whisper
+(transcription) and Deepgram Aura (voice).
+
 ## Run it
 
 ```
 npm install
-printf 'OPENAI_API_KEY=sk-...\nACCESS_CODE=pick-one\n' > .dev.vars
+printf 'ACCESS_CODE=pick-one\n' > .dev.vars
 npm run dev
 ```
 
-Camera access needs HTTPS on a phone, so test on the deployed Worker (`npm run deploy`, then
-`wrangler secret put OPENAI_API_KEY` and `wrangler secret put ACCESS_CODE`).
+Camera access needs HTTPS on a phone, so test on the deployed Worker: `npm run deploy`, then
+`wrangler secret put ACCESS_CODE`. Always deploy with `npm run deploy`, since a bare
+`wrangler deploy` ships the last build.
 
 `npm run lint` runs the vendored [anti-slop](https://github.com/dmmulroy/anti-slop) Oxlint rules.

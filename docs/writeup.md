@@ -91,5 +91,7 @@ Guardrails: answer latency (p50 under 3 seconds), wrong-fact reports, opt-out ra
 
 ## How this demo is built
 
-A phone web app (React) and a Cloudflare Worker. OpenAI handles transcription, vision routing,
-phrasing and speech. The property, units and people are made up. The "unit" is my house.
+A phone web app (React) and a Cloudflare Worker. Cloudflare Workers AI handles transcription
+(Whisper), vision routing and phrasing (Mistral Small 3.1) and speech (Deepgram Aura), so the
+demo costs nothing to run. About 4 to 6 seconds per question today. A production version would
+use a faster realtime model and stream the voice. The property, units and people are made up. The "unit" is my house.

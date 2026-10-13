@@ -7,7 +7,7 @@ export async function openCamera() {
 
 export function grabFrame(video: HTMLVideoElement) {
   const canvas = document.createElement("canvas");
-  const scale = Math.min(1, 768 / video.videoWidth);
+  const scale = Math.min(1, 512 / video.videoWidth);
 
   canvas.width = Math.round(video.videoWidth * scale);
   canvas.height = Math.round(video.videoHeight * scale);

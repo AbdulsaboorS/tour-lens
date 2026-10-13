@@ -11,7 +11,9 @@ import { b, cues, mismatchStop } from "./cues";
 import { SCREEN, TourPhone } from "./TourPhone";
 
 loadInter("normal", { weights: ["400", "500"] });
+
 loadInterTight("normal", { weights: ["500", "600"] });
+
 loadPlexMono("normal", { weights: ["500"] });
 
 export type Layout = "wide" | "tall";
@@ -26,6 +28,7 @@ const firstStop = cues.stops[0];
 
 function punchlines(layout: Layout): Card[] {
   const wide = layout === "wide";
+
   const opening: Card = {
     lines: [
       [{ text: "Point.", at: b(1, 1) }, { text: "Ask.", at: b(1, 2) }],

@@ -17,17 +17,25 @@ unit specs come from code reading the property data, and every answer cites the 
 If what the camera sees doesn't match the records, the agent says so. Leasing actions (hold,
 book, apply) run only after the prospect confirms.
 
-## Open decisions (decide before building past the prototype)
-- Budget: zero cost (Cloudflare Workers AI vision + STT/TTS) vs a few dollars (OpenAI Realtime).
-- Scope: a recorded video of one tour vs a link a recruiter can try on their own phone.
-- Stack: phone web app (TypeScript/React, matches EliseAI) + Python backend.
+## Decisions (2026-10-13)
+- Goal: product manager application. Audience is EliseAI product people, reached by DM.
+- Deliverable: a screen-recorded tour video plus a PM write-up (`docs/writeup.md`), both in
+  GitHub. No public live link: the deployed app sits behind an access code.
+- The tour happens in the owner's real home, presented as a fictional unit. Stops: washer
+  (with a planted records mismatch), window, couch, desk setup, then hold the unit and recap.
+- Budget: a few dollars of OpenAI (vision, transcription, speech). Keep a spend cap on the key.
+- Interaction: push-to-talk. One camera frame plus one utterance per turn.
+- Stack: one TypeScript app (Vite + React) with a Cloudflare Worker API, deployed to Cloudflare.
+- Lint: vendored anti-slop Oxlint rules in `tools/oxlint/anti-slop/`. Code must pass `npm run lint`.
+- Look: borrow EliseAI's visual language (palette, type, spacing). No EliseAI logo or name in
+  the app UI except the footer line saying it's a concept demo and not affiliated.
 
 ## Style
 - Never use em dashes anywhere: code, comments, docs, UI copy, commit messages.
 - Docs in the owner's voice: casual, direct, plain. No corporate jargon.
 - Comments sparse, only where the why isn't obvious. The code is part of the portfolio.
 - No abstractions for one caller, no defensive code for impossible cases, no dead code.
-- Fictional property, units and people. Don't imitate EliseAI's branding.
+- Fictional property, units and people.
 
 ## Workflow
 - Commit in small logical steps and `git push origin main` after every commit.

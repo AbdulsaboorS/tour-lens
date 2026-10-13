@@ -1,0 +1,4 @@
+/* The app animates the talk button with a CSS transition. Films draw every state from the frame. */
+.talk {
+  transition: none;
+}

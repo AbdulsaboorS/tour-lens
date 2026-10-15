@@ -8,3 +8,5 @@ SESSION.md
 .dev.vars
 .wrangler/
 .playwright-mcp/
+.apollo-key
+outreach/

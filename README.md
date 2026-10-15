@@ -8,9 +8,9 @@ and flags it for the leasing team.
 A concept demo I built for my EliseAI product manager application. It extends AI-Guided Tours.
 Not affiliated with EliseAI. The property, units and people are made up.
 
-[![Tour Lens demo: the agent flags that the records list a top-load washer while the camera shows a front-loader](docs/media/preview.gif)](docs/media/tour-lens.mp4)
+https://github.com/user-attachments/assets/60fdf31c-f1bf-4836-8c22-4deb8b3e48c0
 
-- **Demo video (1 min, with sound):** [docs/media/tour-lens.mp4](docs/media/tour-lens.mp4)
+- **Demo video file (1 min):** [docs/media/tour-lens.mp4](docs/media/tour-lens.mp4)
 - **Try it:** https://tour-lens.feedback-signal.workers.dev (access code in my message)
 - **The product write-up:** [docs/writeup.md](docs/writeup.md)
 - **Research:** [docs/research.md](docs/research.md)
@@ -35,22 +35,6 @@ suggested question can't get through, the app plays a saved real answer and labe
    them, and writes the line shown on screen from the records it cited.
 5. The same model phrases the spoken answer from that briefing only, and Deepgram Aura says it.
 6. Holds run only after you tap Confirm. The recap collects everything for the leasing team.
-
-## Run it
-
-```
-npm install
-printf 'ACCESS_CODE=pick-one\nCEREBRAS_API_KEY=...\n' > .dev.vars
-npm run dev
-```
-
-Camera access needs HTTPS on a phone, so test on the deployed Worker: `npm run deploy`, then
-`wrangler secret put ACCESS_CODE` and `wrangler secret put CEREBRAS_API_KEY`. Always deploy with
-`npm run deploy`, since a bare `wrangler deploy` ships the last build.
-
-`npm run lint` runs the vendored [anti-slop](https://github.com/dmmulroy/anti-slop) Oxlint rules.
-The film lives in `videos/` (Remotion). `videos/scripts/capture.ts` runs the tour through the
-live app and saves what it really said.
 
 ## Credits
 

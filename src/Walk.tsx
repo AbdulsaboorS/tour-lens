@@ -10,7 +10,7 @@ export const rooms: Room[] = [
     label: "Living room",
     suggestions: ["Does this furniture come with it? How big is this room?", "I love it. Can you hold it for me?"],
   },
-  { id: "desk", label: "Desk nook", suggestions: ["Could I work from home here?"] },
+  { id: "desk", label: "Dining area", suggestions: ["Could I work from home here?"] },
 ];
 
 // Zoomed past cover so there's room to look around in both directions.

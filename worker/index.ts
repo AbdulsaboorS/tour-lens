@@ -44,7 +44,10 @@ function brief(sight: Sight, picked: Route) {
     lines.push(`Pending action: a free 48-hour hold on unit ${building.tourUnit}. It is not held yet. Tell the renter you can hold it and ask them to tap Confirm on screen.`);
   }
 
+  const shown = cited.filter((record) => !contradicted.includes(record)).slice(0, 2);
+
   return {
+    headline: shown.map((record) => record.gist).join(" \u00b7 ") || "Not in the records",
     briefing: `Briefing:\n${cited.length > 0 ? "" : "No records match.\n\n"}${lines.join("\n\n")}`,
     citations: cited.map(({ id, title, source }) => ({ id, title, source })),
     mismatches: claims,
@@ -73,8 +76,8 @@ async function ask(request: Request, env: Env) {
 
   const sight = await timed("look", look(env.AI, image, question));
   const picked = await timed("route", route(env.CEREBRAS_API_KEY, question, sight.seen, history.slice(-3)));
-  const { briefing, citations, mismatches } = brief(sight, picked);
-  const { spoken: answer, headline } = await timed("phrase", phrase(env.CEREBRAS_API_KEY, question, sight.seen, briefing));
+  const { headline, briefing, citations, mismatches } = brief(sight, picked);
+  const answer = await timed("phrase", phrase(env.CEREBRAS_API_KEY, question, sight.seen, briefing));
   const speech = await timed("speak", speak(env.AI, answer));
 
   return Response.json({

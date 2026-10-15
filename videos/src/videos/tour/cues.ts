@@ -11,7 +11,7 @@ const beat = beatLength(grid);
 /** The first beat at or after `seconds`. */
 const onBeat = (seconds: number) => Math.ceil(seconds / beat - 1e-6) * beat;
 
-export type Captured = (typeof capture.stops)[number];
+export type Captured = ReturnType<typeof stopData>;
 
 export type StopCue = {
   data: Captured;
@@ -31,9 +31,9 @@ const FILM_STOPS = ["washer", "living-room", "hold"];
 function stopData(id: string) {
   const data = capture.stops.find((stop) => stop.id === id);
 
-  if (!data) throw new Error(`capture.json has no stop ${id}`);
+  if (!data?.clip || !data.clipSeconds) throw new Error(`capture.json has no clip for stop ${id}`);
 
-  return data;
+  return { ...data, clip: data.clip, clipSeconds: data.clipSeconds };
 }
 
 function plan() {

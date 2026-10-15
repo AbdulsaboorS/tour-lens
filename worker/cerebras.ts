@@ -80,10 +80,7 @@ export async function route(key: string, question: string, seen: string, history
   return routeSchema.parse(JSON.parse(await complete(key, request)));
 }
 
-const phraseSchema = z.strictObject({
-  spoken: z.string(),
-  headline: z.string(),
-});
+const phraseSchema = z.strictObject({ spoken: z.string() });
 
 const { $schema: _phraseSchema, ...phraseJsonSchema } = z.toJSONSchema(phraseSchema);
 
@@ -102,22 +99,21 @@ export async function phrase(key: string, question: string, seen: string, briefi
         role: "system",
         content: [
           "You are the voice of a self-guided apartment tour, talking to a renter standing in Unit 4B.",
-          "spoken: answer the question they actually asked, out loud, in at most two short sentences, under 40 words total.",
+          "Answer the question they actually asked, out loud, in at most two short sentences, under 40 words total.",
           "Every fact in the briefing is true. Answer only from it, including facts about other units.",
           "Quote numbers exactly as written. Never add a number, brand, price or policy that isn't in the briefing.",
           "Don't do math and don't judge whether something fits. Give the measurement and let the renter compare.",
           "Don't name a brand or model the briefing says the camera contradicts.",
-          "If the briefing has a mismatch that isn't none, lead with it, like this: The records list an LG washer here, but this one looks different, so I've flagged it for the leasing team.",
+          "If the briefing has a mismatch that isn't none, lead with it, like this: The records list X here, but the camera shows something different, so I've flagged it for the leasing team.",
           "Only if no briefing fact answers the question, say the records don't cover it and offer to text the leasing team.",
           "Plain spoken sentences. No lists, no markdown, no greetings.",
-          "headline: the answer's gist for the screen, at most 6 words, no period, like Pods OK, HE detergent only or Staging only, 14 ft 2 in by 12 ft 8 in. Same facts as spoken, nothing new. Leave the mismatch out of it, the screen shows that separately.",
         ].join(" "),
       },
       { role: "user", content: `Camera sees: ${seen}\nRenter asks: ${question}\n\n${briefing}` },
     ],
   });
 
-  const { spoken, headline } = phraseSchema.parse(JSON.parse(await complete(key, request)));
+  const { spoken } = phraseSchema.parse(JSON.parse(await complete(key, request)));
 
-  return { spoken: noDashes(spoken), headline: noDashes(headline) };
+  return noDashes(spoken);
 }

@@ -1,14 +1,15 @@
 {
-  "capturedAt": "2026-10-15T06:31:56.104Z",
+  "capturedAt": "2026-10-15T07:16:41.657Z",
   "stops": [
     {
       "id": "washer",
-      "photo": "washer.jpg",
+      "clip": "washer.mp4",
+      "clipSeconds": 15.6,
       "asked": "What kind of washer is this? Can I use pods?",
-      "question": "What kind of washer is this? Can I use pots?",
-      "seen": "Samsung washer in corner of laundry room",
-      "answer": "The records list an LG washer here, but this one looks different, so I’ve flagged it for the leasing team. HE detergent only; pods are fine.",
-      "headline": "HE detergent only, pods OK",
+      "question": "What kind of washer is this? Can I use pods?",
+      "seen": "front loading washing machine",
+      "answer": "The records list a top‑load washer, but the camera shows a front‑loading machine, so I’ve flagged it for the leasing team. HE detergent only, and pods are fine.",
+      "headline": "Pods OK, HE detergent only",
       "citations": [
         {
           "id": "washer.spec",
@@ -22,22 +23,23 @@
         }
       ],
       "mismatches": [
-        "The spec sheet lists an LG washer."
+        "The spec sheet lists a top-load washer."
       ],
       "pendingHold": false,
-      "responseSeconds": 4.6,
-      "serverTiming": "transcribe;dur=1358, look;dur=1779, route;dur=263, phrase;dur=358, speak;dur=739",
+      "responseSeconds": 2.7,
+      "serverTiming": "transcribe;dur=709, look;dur=1247, route;dur=157, phrase;dur=175, speak;dur=296",
       "questionSeconds": 3.186833,
-      "answerSeconds": 8.306833
+      "answerSeconds": 8.568167
     },
     {
       "id": "window",
-      "photo": "window.jpg",
+      "clip": null,
+      "clipSeconds": null,
       "asked": "What's the view like? Is there a unit with a better one?",
-      "question": "What's the view like? Is there a reunion with a better one?",
-      "seen": "alley with parked cars",
+      "question": "What's the view like? Is there a unit with a better one?",
+      "seen": "empty room with two windows and a door",
       "answer": "Unit 4B faces east over the courtyard garden with direct sun from about 7 am to 11 am. A unit with a downtown skyline view is Unit 7A on the seventh floor.",
-      "headline": "East courtyard view",
+      "headline": "East courtyard view, morning sun · 7A has a skyline view",
       "citations": [
         {
           "id": "window.view",
@@ -52,19 +54,20 @@
       ],
       "mismatches": [],
       "pendingHold": false,
-      "responseSeconds": 5,
-      "serverTiming": "transcribe;dur=2227, look;dur=1279, route;dur=418, phrase;dur=358, speak;dur=542",
+      "responseSeconds": 2.6,
+      "serverTiming": "transcribe;dur=812, look;dur=693, route;dur=367, phrase;dur=191, speak;dur=511",
       "questionSeconds": 3.709333,
       "answerSeconds": 9.743667
     },
     {
       "id": "living-room",
-      "photo": "living-room.jpg",
+      "clip": "living-room.mp4",
+      "clipSeconds": 29.733333,
       "asked": "Does this furniture come with it? How big is this room?",
       "question": "Does this furniture come with it? How big is this room?",
-      "seen": "living room with couch and coffee table",
-      "answer": "The couch and decor are staging and don’t come with the unit. The living room measures 14 ft 2 in by 12 ft 8 in.",
-      "headline": "14 ft 2 in by 12 ft 8 in",
+      "seen": "gray sectional sofa",
+      "answer": "The couch is staging only and doesn’t come with the unit. The living room measures 14 ft 2 in by 12 ft 8 in.",
+      "headline": "14 ft 2 in by 12 ft 8 in · Staging only, not included",
       "citations": [
         {
           "id": "living_room.dimensions",
@@ -79,19 +82,20 @@
       ],
       "mismatches": [],
       "pendingHold": false,
-      "responseSeconds": 3.3,
-      "serverTiming": "transcribe;dur=1126, look;dur=796, route;dur=224, phrase;dur=221, speak;dur=900",
+      "responseSeconds": 3.4,
+      "serverTiming": "transcribe;dur=622, look;dur=1148, route;dur=663, phrase;dur=185, speak;dur=729",
       "questionSeconds": 2.8995,
-      "answerSeconds": 7.444833
+      "answerSeconds": 7.627667
     },
     {
       "id": "desk",
-      "photo": "desk.jpg",
+      "clip": null,
+      "clipSeconds": null,
       "asked": "Could I work from home here?",
       "question": "And I work from home here.",
-      "seen": "desk with computer and keyboard",
-      "answer": "The desk nook fits a desk up to 5 ft wide and has two outlets. You also have Bayline Fiber 1 Gbps internet included in the $95 amenity fee.",
-      "headline": "Desk fits 5 ft, 1 Gbps",
+      "seen": "dining table with six chairs and two bottles on it",
+      "answer": "The unit has Bayline Fiber at 1 Gbps up and down, included in the $95 monthly amenity fee, with a preinstalled router and Ethernet jacks in the living room and bedroom. The desk nook fits a desk up to 5 ft wide and has two outlets.",
+      "headline": "1 Gbps fiber, desk nook fits 5 ft",
       "citations": [
         {
           "id": "internet.service",
@@ -101,19 +105,20 @@
       ],
       "mismatches": [],
       "pendingHold": false,
-      "responseSeconds": 8.4,
-      "serverTiming": "transcribe;dur=565, look;dur=1455, route;dur=388, phrase;dur=5406, speak;dur=539",
+      "responseSeconds": 4.8,
+      "serverTiming": "transcribe;dur=656, look;dur=1519, route;dur=186, phrase;dur=1444, speak;dur=961",
       "questionSeconds": 1.671833,
-      "answerSeconds": 9.665333
+      "answerSeconds": 15.647333
     },
     {
       "id": "hold",
-      "photo": "living-room.jpg",
+      "clip": "living-room.mp4",
+      "clipSeconds": 29.733333,
       "asked": "I love it. Can you hold it for me?",
       "question": "I love it. Can you hold it for me?",
-      "seen": "coffee table with tea set",
-      "answer": "I can place a free 48‑hour hold; tap Confirm to proceed.",
-      "headline": "Free 48‑hour hold",
+      "seen": "picture of London Eye on couch",
+      "answer": "I can place a free 48-hour hold on unit 4B for you; just tap Confirm on the screen to secure it.",
+      "headline": "Free 48-hour hold, no deposit",
       "citations": [
         {
           "id": "unit.hold",
@@ -123,17 +128,17 @@
       ],
       "mismatches": [],
       "pendingHold": true,
-      "responseSeconds": 6,
-      "serverTiming": "transcribe;dur=2672, look;dur=712, route;dur=143, phrase;dur=1970, speak;dur=454",
+      "responseSeconds": 3.5,
+      "serverTiming": "transcribe;dur=1142, look;dur=1185, route;dur=252, phrase;dur=248, speak;dur=640",
       "questionSeconds": 1.724,
-      "answerSeconds": 3.474167
+      "answerSeconds": 5.616333
     }
   ],
   "hold": {
     "hold": {
-      "id": "H-35E9FD",
+      "id": "H-B58609",
       "unit": "4B",
-      "expires": "2026-10-17T06:31:55.628Z"
+      "expires": "2026-10-17T07:16:41.334Z"
     },
     "answer": "Done. Unit 4B is held for you for 48 hours, no deposit. Your application link is on screen.",
     "headline": "4B held for 48 hours",

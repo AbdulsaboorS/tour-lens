@@ -1,4 +1,4 @@
-import { Easing, Img, staticFile } from "remotion";
+import { Easing, Loop, OffthreadVideo, Sequence, staticFile, useVideoConfig } from "remotion";
 
 import { progress } from "../../kit/time";
 import capture from "./capture.json";
@@ -83,39 +83,39 @@ function HoldCard({ t, start }: { t: number; start: number }) {
   );
 }
 
-/**
- * The feed is a still photo, so fake a handheld phone: each new stop starts wide and off target,
- * pushes in toward the object while the renter walks up, then settles with a slight sway.
- */
-function handheld(t: number, stop: (typeof cues.stops)[number], continuing: boolean) {
-  const approach = continuing ? 1 : ease(progress(t, stop.enter, stop.press - stop.enter + 0.8));
-  const sway = 1 - approach * 0.5;
+/** Stops that share a clip keep it rolling, so it starts at the first of them. */
+function clipStart(stop: (typeof cues.stops)[number]) {
+  const run = cues.stops.slice(0, cues.stops.indexOf(stop) + 1);
+  const first = run.findLast((candidate, index) => index === 0 || run[index - 1].data.clip !== candidate.data.clip);
 
-  const scale = 1.04 + 0.16 * approach;
-  const x = (1 - approach) * 4 + Math.sin(t * 1.3) * 0.6 * sway;
-  const y = (1 - approach) * 3 + Math.cos(t * 1.7) * 0.5 * sway + Math.sin(t * 7) * 0.4 * (1 - approach);
-  const rotate = Math.sin(t * 0.9) * 0.5 * sway;
+  return first?.enter ?? stop.enter;
+}
 
-  return { scale: String(scale), translate: `${x}% ${y}%`, rotate: `${rotate}deg` };
+// The clips play forward then back, so looping them never jumps.
+function Clip({ stop, style }: { stop: (typeof cues.stops)[number]; style: React.CSSProperties }) {
+  const { fps } = useVideoConfig();
+
+  return (
+    <div className="camera" style={{ overflow: "hidden", ...style }}>
+      <Sequence from={Math.round(clipStart(stop) * fps)} layout="none">
+        <Loop durationInFrames={Math.floor(stop.data.clipSeconds * fps)} layout="none">
+          <OffthreadVideo className="camera" src={staticFile(`clips/${stop.data.clip}`)} muted />
+        </Loop>
+      </Sequence>
+    </div>
+  );
 }
 
 function Feed({ t }: { t: number }) {
   const stop = stopAt(t);
   const index = cues.stops.indexOf(stop);
   const previous = cues.stops[index - 1];
-  const continuing = previous !== undefined && previous.data.photo === stop.data.photo;
-  const slide = previous && !continuing ? ease(progress(t, stop.enter, 0.6)) : 1;
+  const slide = previous && previous.data.clip !== stop.data.clip ? ease(progress(t, stop.enter, 0.6)) : 1;
 
   return (
     <>
-      {previous && slide < 1 && (
-        <div className="camera" style={{ translate: `${-slide * 100}% 0`, overflow: "hidden" }}>
-          <Img className="camera" src={staticFile(`stops/${previous.data.photo}`)} style={handheld(t, previous, true)} />
-        </div>
-      )}
-      <div className="camera" style={{ translate: `${(1 - slide) * 100}% 0`, overflow: "hidden" }}>
-        <Img className="camera" src={staticFile(`stops/${stop.data.photo}`)} style={handheld(t, stop, continuing)} />
-      </div>
+      {previous && slide < 1 && <Clip stop={previous} style={{ translate: `${-slide * 100}% 0` }} />}
+      <Clip stop={stop} style={{ translate: `${(1 - slide) * 100}% 0` }} />
     </>
   );
 }
@@ -219,10 +219,11 @@ export function TourPhone({ t }: { t: number }) {
           </div>
         )}
         <button className={`talk ${status}`} style={{ position: "relative" }}>
-          {status === "idle" && "Hold to ask"}
-          {status === "listening" && "Listening"}
+          {status === "idle" && "Tap to ask"}
+          {status === "listening" && "Listening, tap when done"}
           {status === "thinking" && "Checking the records"}
-          <Tap t={t} at={stop.press} lift={stop.release} />
+          <Tap t={t} at={stop.press} lift={stop.press + 0.15} />
+          <Tap t={t} at={stop.release - 0.15} lift={stop.release} />
         </button>
         <p className="footer">Concept demo for EliseAI AI-Guided Tours. Not affiliated with EliseAI.</p>
       </section>

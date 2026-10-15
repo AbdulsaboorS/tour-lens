@@ -103,10 +103,10 @@ function HowItWorks({ t }: { t: number }) {
   return (
     <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", gap: 28, opacity: 1 - leave, textAlign: "center", padding: 80 }}>
       <p style={{ font: `600 84px/1.1 ${fonts.display}`, color: color.white, opacity: enter, translate: `0 ${(1 - enter) * 30}px` }}>
-        The model looks and talks.
+        A live guide that sees what you see.
       </p>
       <p style={{ font: `600 84px/1.1 ${fonts.display}`, color: color.lavender, opacity: second, translate: `0 ${(1 - second) * 30}px` }}>
-        Code decides the facts.
+        And only says what the records say.
       </p>
     </AbsoluteFill>
   );
@@ -124,7 +124,7 @@ function EndCard({ t }: { t: number }) {
         Your AI tour guide.
       </p>
       <p style={{ font: `500 44px/1.3 ${fonts.display}`, color: color.lavender, opacity: enter }}>
-        It sees what you see, and answers from the records.
+        Ask anything while you tour.
       </p>
       <div style={{ opacity: credit, marginTop: 48, display: "flex", flexDirection: "column", gap: 16 }}>
         <p style={{ font: `500 34px/1.3 ${fonts.body}`, color: color.white }}>A prototype by Abdulsaboor Shaikh for EliseAI</p>

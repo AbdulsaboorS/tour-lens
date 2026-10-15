@@ -6,9 +6,9 @@ import { join, resolve } from "node:path";
  *
  *   TOUR_CODE=... VOICE_URL=... bun scripts/capture.ts
  *
- * For each stop: speak the renter's question (Aura, a second voice), send it with the stop photo
+ * For each stop: speak the renter's question (Aura, a second voice), send it with the stop frame
  * to /api/ask as one continuing tour, then save the answer, citations, timings and the app's voice.
- * Ends with /api/hold. Needs macOS (sips, afinfo). Re-run after swapping photos in public/stops.
+ * Ends with /api/hold. Needs macOS (sips, afinfo) and ffmpeg. Re-run after scripts/clips.py.
  */
 const TOUR_URL = process.env.TOUR_URL ?? "https://tour-lens.feedback-signal.workers.dev";
 const code = process.env.TOUR_CODE;
@@ -23,12 +23,14 @@ const tmp = join(root, "out/capture");
 mkdirSync(audioDir, { recursive: true });
 mkdirSync(tmp, { recursive: true });
 
+// Film stops send a frame of the clip the phone shows, at about the moment the renter asks.
+// The rest send the sample tour's room still, like the app does.
 const stops = [
-  { id: "washer", photo: "washer.jpg", question: "What kind of washer is this? Can I use pods?" },
-  { id: "window", photo: "window.jpg", question: "What's the view like? Is there a unit with a better one?" },
-  { id: "living-room", photo: "living-room.jpg", question: "Does this furniture come with it? How big is this room?" },
-  { id: "desk", photo: "desk.jpg", question: "Could I work from home here?" },
-  { id: "hold", photo: "living-room.jpg", question: "I love it. Can you hold it for me?" },
+  { id: "washer", clip: "washer.mp4", at: 1.5, question: "What kind of washer is this? Can I use pods?" },
+  { id: "window", room: "window.jpg", question: "What's the view like? Is there a unit with a better one?" },
+  { id: "living-room", clip: "living-room.mp4", at: 1.5, question: "Does this furniture come with it? How big is this room?" },
+  { id: "desk", room: "desk.jpg", question: "Could I work from home here?" },
+  { id: "hold", clip: "living-room.mp4", at: 18, question: "I love it. Can you hold it for me?" },
 ];
 
 function run(command: string[]) {
@@ -55,11 +57,15 @@ async function speakAs(text: string, file: string) {
   writeFileSync(file, new Uint8Array(await response.arrayBuffer()));
 }
 
-// The app sends a 512 px wide camera frame, so send the same.
-function frame(photo: string) {
-  const out = join(tmp, photo);
+// The app sends a camera frame at most 512 px wide, so send the same.
+function frame(stop: (typeof stops)[number]) {
+  const out = join(tmp, `${stop.id}.jpg`);
 
-  run(["sips", "-s", "format", "jpeg", "--resampleWidth", "512", join(root, "public/stops", photo), "--out", out]);
+  if (stop.clip) {
+    run(["ffmpeg", "-loglevel", "error", "-y", "-ss", String(stop.at), "-i", join(root, "public/clips", stop.clip), "-frames:v", "1", "-vf", "scale=512:-2", out]);
+  } else {
+    run(["sips", "-s", "format", "jpeg", "--resampleWidth", "512", join(root, "../public/rooms", stop.room!), "--out", out]);
+  }
 
   return `data:image/jpeg;base64,${readFileSync(out).toString("base64")}`;
 }
@@ -75,7 +81,7 @@ for (const stop of stops) {
   const form = new FormData();
 
   form.set("audio", new File([readFileSync(questionFile)], "question.mp3", { type: "audio/mpeg" }));
-  form.set("image", frame(stop.photo));
+  form.set("image", frame(stop));
   form.set("history", JSON.stringify(history));
 
   const started = Date.now();
@@ -91,7 +97,8 @@ for (const stop of stops) {
   history.push({ question: result.question, answer: result.answer });
   captured.push({
     id: stop.id,
-    photo: stop.photo,
+    clip: stop.clip ?? null,
+    clipSeconds: stop.clip ? Number(run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", join(root, "public/clips", stop.clip)])) : null,
     asked: stop.question,
     question: result.question,
     seen: result.seen,

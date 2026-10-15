@@ -16,7 +16,7 @@ const rows = [
     ...(stop.done !== undefined ? [[s(stop.done), "", "\"Done. Unit 4B is held...\""]] : []),
   ]),
   [s(cues.recap), "Recap", "Tap Recap; the leasing team recap slides up."],
-  [s(cues.how), "How it works", "\"The model looks and talks. Code decides the facts.\""],
+  [s(cues.how), "How it works", "\"A live guide that sees what you see. And only says what the records say.\""],
   [s(cues.close), "End card", "\"Your AI tour guide.\" Credit to Abdulsaboor Shaikh, real-responses and not-affiliated line, repo URL."],
   [s(cues.duration), "End", ""],
 ];

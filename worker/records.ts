@@ -12,6 +12,8 @@ export type VisualCheck = {
 export type PropertyRecord = {
   id: string;
   title: string;
+  /** What the answer card shows when this record answers the question. */
+  gist: string;
   source: string;
   about: string;
   facts: string[];
@@ -28,25 +30,27 @@ export const records: PropertyRecord[] = [
   {
     id: "washer.spec",
     title: "In-unit laundry",
+    gist: "Top-load washer, 4.5 cu ft",
     source: "Unit 4B spec sheet, Aug 2026",
-    about: "the washer or laundry area in unit 4B: brand, model, capacity",
+    about: "the washer, dryer or laundry area in unit 4B: type, capacity, repairs",
     facts: [
-      "LG WM3400CW washer, 4.5 cu ft, installed 2023.",
+      "Top-load washer, 4.5 cu ft, with a matching dryer, installed 2023.",
       "Washer repairs are covered by maintenance, same week.",
     ],
     checks: [
       {
-        key: "washer_is_lg",
-        question: "Washing machine in frame with a readable brand: true if the brand is LG, false if it's another brand.",
-        expected: true,
-        claim: "The spec sheet lists an LG washer.",
-        fact: "LG WM3400CW washer, 4.5 cu ft, installed 2023.",
+        key: "washer_front_load",
+        question: "Washing machine in frame: true if it loads from the front through a round door, false if it loads from a lid on top.",
+        expected: false,
+        claim: "The spec sheet lists a top-load washer.",
+        fact: "Top-load washer, 4.5 cu ft, with a matching dryer, installed 2023.",
       },
     ],
   },
   {
     id: "washer.policy",
     title: "Laundry rules",
+    gist: "Pods OK, HE detergent only",
     source: "Resident handbook, section 6",
     about: "what detergent can be used, pods, quiet hours for laundry",
     facts: [
@@ -57,6 +61,7 @@ export const records: PropertyRecord[] = [
   {
     id: "window.view",
     title: "Unit 4B view and light",
+    gist: "East courtyard view, morning sun",
     source: "Unit 4B spec sheet, Aug 2026",
     about: "what the window in unit 4B looks out on, which way it faces, sunlight, blinds",
     facts: [
@@ -68,6 +73,7 @@ export const records: PropertyRecord[] = [
   {
     id: "units.compare_view",
     title: "Other available units",
+    gist: "7A has a skyline view",
     source: "Availability report, Oct 13 2026",
     about: "other open units to compare against 4B, better views, prices, move-in dates",
     facts: [
@@ -79,6 +85,7 @@ export const records: PropertyRecord[] = [
   {
     id: "living_room.dimensions",
     title: "Living room measurements",
+    gist: "14 ft 2 in by 12 ft 8 in",
     source: "Floor plan A1, rev 3",
     about: "living room size, wall lengths, how much furniture the room holds",
     facts: [
@@ -89,6 +96,7 @@ export const records: PropertyRecord[] = [
   {
     id: "unit.staging",
     title: "Model unit staging",
+    gist: "Staging only, not included",
     source: "Leasing policy, section 4",
     about: "whether the couch, desk or other furniture in the unit comes with it, furnished or unfurnished",
     facts: [
@@ -99,6 +107,7 @@ export const records: PropertyRecord[] = [
   {
     id: "internet.service",
     title: "Internet",
+    gist: "1 Gbps fiber, desk nook fits 5 ft",
     source: "Amenity sheet, 2026",
     about: "internet speed, wifi, working from home, where a desk or computer setup could go, ethernet",
     facts: [
@@ -111,6 +120,7 @@ export const records: PropertyRecord[] = [
   {
     id: "unit.pricing",
     title: "Rent and fees",
+    gist: "$2,150 a month, 12-month lease",
     source: "Unit 4B pricing, Oct 13 2026",
     about: "rent, deposit, fees, utilities, lease length for unit 4B",
     facts: [
@@ -122,6 +132,7 @@ export const records: PropertyRecord[] = [
   {
     id: "unit.hold",
     title: "Holding a unit",
+    gist: "Free 48-hour hold, no deposit",
     source: "Leasing policy, section 2",
     about: "holding or reserving unit 4B, taking it off the market, next steps to apply",
     facts: [

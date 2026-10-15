@@ -28,7 +28,7 @@ EliseAI help docs) blocked direct reads, so those parts rest on search snippets.
 - Apartments.com and Zillow inside ChatGPT: remote listing search, not on-site.
 - Inspection apps (Shipshape, InspectorIQ): read appliance data plates for inspectors.
 - ChatGPT video, Gemini Live, Meta glasses, OpenAI Realtime with images: see and talk, but
-  generic. They know "a Nest thermostat", not "this unit's 2023 LG washer, pods allowed".
+  generic. They know "a Nest thermostat", not "this unit's washer, pods allowed under section 6".
 - Verdict: in-person tour + camera + voice + property-grounded answers + leasing actions is not
   shipped anywhere we could find.
 

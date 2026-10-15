@@ -11,20 +11,21 @@ stacked?" That's slow, and most people won't bother. The question dies, and so d
 moment when they were most interested.
 
 Phone camera assistants (ChatGPT, Gemini Live) can see the washer, but they don't know this
-building. They'll tell you what an LG washer usually is, not what the spec sheet for Unit 4B
-says, and not that pods are allowed under section 6 of the handbook.
+building. They'll tell you what a washer like that usually is, not what the spec sheet for
+Unit 4B says, and not that pods are allowed under section 6 of the handbook.
 
 No tour product I could find does camera + voice + answers from the property's own records +
 leasing actions. Notes are in `research.md`.
 
 ## What it does
 
-Hold the button, point at something, ask out loud.
+Point the phone at something, tap the button, ask out loud.
 
 1. **Washer:** "What's this, and can I use pods?" The answer comes from the spec sheet and the
    handbook, with both sources shown.
-2. **Records mismatch:** the spec sheet says it's an LG washer. The camera sees a Samsung.
-   The agent says so, and flags it for the leasing team instead of repeating the listing.
+2. **Records mismatch:** the spec sheet says it's a top-load washer. The camera sees a
+   front-loader. The agent says so, and flags it for the leasing team instead of repeating the
+   listing.
 3. **Window:** "What's the view like? Is there a better one?" It answers for 4B, then compares
    against the other open units.
 4. **Living room:** "Does this furniture come with it? How big is this room?" It says the unit
@@ -37,13 +38,15 @@ Hold the button, point at something, ask out loud.
 
 ## The one rule
 
-The model looks and talks. Code decides the facts.
+A live guide that sees what you see, and only says what the records say. Under the hood: the
+model looks and talks, and code decides the facts.
 
 Three narrow jobs. A vision model only looks: it names what's in frame and answers yes/no
-checks ("is this washer an LG?"). A language model only routes: it picks which records answer
+checks ("is this washer a front-loader?"). A language model only routes: it picks which records answer
 the question. Plain code pulls those records, compares the checks against what the records
 claim, and hands the speaking model a briefing. The speaking
-model can only use what's in that briefing. Every answer shows its sources. Holds and
+model can only use what's in that briefing, and the short line on screen comes straight from
+the cited records, not the model. Every answer shows its sources. Holds and
 applications never run on the model's say-so.
 
 That's the thing that makes it shippable for operators. A wrong rent number on a tour is a trust and
@@ -54,6 +57,10 @@ compliance problem, not a funny hallucination.
 - AI-Guided Tours already owns the moment: the prospect is unlocked into the unit and talking
   to Elise. The unlock event tells you which unit they're in, so "what's the view like" has a
   right answer.
+- Elise already knows where the prospect is standing: the Engrain map follows them and serves
+  photos and details as they move. Tour Lens adds what they're looking at, and catches when the
+  listing is wrong. As of October 2026 I couldn't find a camera feature like this at EliseAI or
+  the other tour products (Tour24, Peek, Rently, Showdigs).
 - Elise already has the property data (CRM/PMS sync) and VoiceAI. This feature mostly connects
   pieces that exist.
 - Apollo shows the direction: agentic, text and voice. Vision is the missing sense.
@@ -85,7 +92,7 @@ Guardrails: answer latency (p50 under 3 seconds), wrong-fact reports, opt-out ra
 
 ## What I'd build next
 
-1. Live voice you can interrupt (realtime audio) instead of push-to-talk.
+1. Live voice you can interrupt (realtime audio) instead of tap-to-talk.
 2. Pull records from the PMS instead of a file, and let the leasing team fix a flagged record in one tap.
 3. Use the Engrain map position to know which room you're in without asking.
 4. Push the recap into the CRM lead so the follow-up text references what they actually asked about.
@@ -94,5 +101,10 @@ Guardrails: answer latency (p50 under 3 seconds), wrong-fact reports, opt-out ra
 
 A phone web app (React) and a Cloudflare Worker. Open models do the AI work: Whisper
 transcribes and Mistral Small 3.1 looks (both on Cloudflare Workers AI), and gpt-oss-120b on
-Cerebras routes and phrases. Deepgram Aura speaks. About 5 seconds per question today, with spikes when the free tiers are busy. A production version would
-use a faster realtime model and stream the voice. The property, units and people are made up. The "unit" is my house.
+Cerebras routes and phrases. Deepgram Aura speaks. About 3 to 5 seconds per question today,
+with spikes when the free tiers are busy. A production version would use a faster realtime
+model and stream the voice.
+
+The property, units and people are made up. The film and the sample tour use openly licensed
+footage of a real laundry and a staged apartment (credits in `videos/public/clips/README.md`).
+Every answer in the film is real output from the live app, sent the exact frame on screen.

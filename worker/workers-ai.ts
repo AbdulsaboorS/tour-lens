@@ -94,5 +94,7 @@ export async function speak(ai: Ai, text: string) {
     { returnRawResponse: true },
   );
 
-  return response.arrayBuffer();
+  // Under load Workers AI sometimes hands back no audio. The card still shows the answer, so the
+  // renter gets it silently instead of an error.
+  return response instanceof Response && response.ok ? response.arrayBuffer() : new ArrayBuffer(0);
 }

@@ -64,7 +64,10 @@ async function ask(request: Request, env: Env) {
 
   async function timed<T>(name: string, step: Promise<T>) {
     const start = Date.now();
-    const result = await step;
+
+    const result = await step.catch((cause: Error) => {
+      throw new Error(`${name} failed: ${cause.message}`, { cause });
+    });
 
     timings.push(`${name};dur=${Date.now() - start}`);
 
@@ -75,9 +78,9 @@ async function ask(request: Request, env: Env) {
   const question = typed ?? (await timed("transcribe", transcribe(env.AI, z.instanceof(File).parse(form.get("audio")))));
 
   const sight = await timed("look", look(env.AI, image, question));
-  const picked = await timed("route", route(env.CEREBRAS_API_KEY, question, sight.seen, history.slice(-3)));
+  const picked = await timed("route", route({ key: env.CEREBRAS_API_KEY, ai: env.AI }, question, sight.seen, history.slice(-3)));
   const { headline, briefing, citations, mismatches } = brief(sight, picked);
-  const answer = await timed("phrase", phrase(env.CEREBRAS_API_KEY, question, sight.seen, briefing));
+  const answer = await timed("phrase", phrase({ key: env.CEREBRAS_API_KEY, ai: env.AI }, question, sight.seen, briefing));
   const speech = await timed("speak", speak(env.AI, answer));
 
   return Response.json({

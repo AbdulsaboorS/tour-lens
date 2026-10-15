@@ -21,42 +21,46 @@ const completionSchema = z.object({
   choices: z.array(z.object({ message: z.object({ content: z.string() }) })).min(1),
 });
 
-function send(key: string, request: string) {
-  return fetch(API, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: request,
-  });
-}
+export type Models = { key: string; ai: Ai };
 
-async function complete(key: string, request: string) {
-  let response = await send(key, request);
+type ChatRequest = {
+  reasoning_effort: "low";
+  response_format: { type: "json_schema"; json_schema: { name: string; strict: true; schema: typeof routeJsonSchema | typeof phraseJsonSchema } };
+  messages: { role: "system" | "user"; content: string }[];
+};
 
-  // The free tier allows few requests per minute, so wait out one rate limit before giving up.
-  if (response.status === 429) {
-    const wait = Math.min(Number(response.headers.get("retry-after") ?? 2), 5);
+// Cerebras is fastest, but its free tier allows few requests a minute. When a few people try the
+// demo at once, the same model on Workers AI takes the overflow. Workers AI sends back an empty
+// object when it's busy too, so both get a few short tries.
+async function complete({ key, ai }: Models, request: ChatRequest) {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const response = await fetch(API, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: MODEL, ...request }),
+    });
 
-    await new Promise((resolve) => setTimeout(resolve, wait * 1000));
-    response = await send(key, request);
+    if (response.ok) return completionSchema.parse(await response.json()).choices[0].message.content.trim();
+
+    if (response.status !== 429) throw new Error(`Cerebras ${response.status}: ${await response.text()}`);
+
+    const overflow = completionSchema.safeParse(await ai.run("@cf/openai/gpt-oss-120b", request));
+
+    if (overflow.success) return overflow.data.choices[0].message.content.trim();
+
+    await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
   }
 
-  if (!response.ok) {
-    const limits = [...response.headers].flatMap(([name, value]) => (name.startsWith("x-ratelimit") ? [`${name}=${value}`] : []));
-
-    throw new Error(`Cerebras ${response.status}: ${await response.text()} ${limits.join(" ")}`);
-  }
-
-  return completionSchema.parse(await response.json()).choices[0].message.content.trim();
+  throw new Error("Cerebras and Workers AI are both busy");
 }
 
 // The model only routes: it picks which records answer the question. It never states facts.
-export async function route(key: string, question: string, seen: string, history: Turn[]) {
+export async function route(models: Models, question: string, seen: string, history: Turn[]) {
   const menu = records.map((record) => `- ${record.id}: ${record.about}`).join("\n");
 
   const recent = history.map((turn) => `Renter: ${turn.question}\nAgent: ${turn.answer}`).join("\n");
 
-  const request = JSON.stringify({
-    model: MODEL,
+  const request: ChatRequest = {
     reasoning_effort: "low",
     response_format: {
       type: "json_schema",
@@ -75,9 +79,9 @@ export async function route(key: string, question: string, seen: string, history
       },
       { role: "user", content: `Camera sees: ${seen}\nRenter asks: ${question}` },
     ],
-  });
+  };
 
-  return routeSchema.parse(JSON.parse(await complete(key, request)));
+  return routeSchema.parse(JSON.parse(await complete(models, request)));
 }
 
 const phraseSchema = z.strictObject({ spoken: z.string() });
@@ -86,9 +90,8 @@ const { $schema: _phraseSchema, ...phraseJsonSchema } = z.toJSONSchema(phraseSch
 
 const noDashes = (text: string) => text.replaceAll(" \u2014 ", ", ").replaceAll("\u2014", ", ");
 
-export async function phrase(key: string, question: string, seen: string, briefing: string) {
-  const request = JSON.stringify({
-    model: MODEL,
+export async function phrase(models: Models, question: string, seen: string, briefing: string) {
+  const request: ChatRequest = {
     reasoning_effort: "low",
     response_format: {
       type: "json_schema",
@@ -111,9 +114,9 @@ export async function phrase(key: string, question: string, seen: string, briefi
       },
       { role: "user", content: `Camera sees: ${seen}\nRenter asks: ${question}\n\n${briefing}` },
     ],
-  });
+  };
 
-  const { spoken } = phraseSchema.parse(JSON.parse(await complete(key, request)));
+  const { spoken } = phraseSchema.parse(JSON.parse(await complete(models, request)));
 
   return noDashes(spoken);
 }

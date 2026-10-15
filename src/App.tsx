@@ -176,7 +176,8 @@ function Tour({ code, session }: { code: string; session: Session }) {
 
       setEntries((previous) => [...previous, { kind: "answer", ...result }]);
       setPendingHold(result.pendingHold);
-      void speaker.play(result.audio);
+
+      if (result.audio) void speaker.play(result.audio);
     } catch {
       setError("The live models are busy. Give it a few seconds and ask again.");
     } finally {
@@ -195,7 +196,8 @@ function Tour({ code, session }: { code: string; session: Session }) {
         ...previous,
         { kind: "hold", answer: result.answer, headline: result.headline, citations: result.citations, holdId: result.hold.id, expires: result.hold.expires },
       ]);
-      void speaker.play(result.audio);
+
+      if (result.audio) void speaker.play(result.audio);
     } catch {
       setError("The hold didn't go through. Try again.");
     } finally {

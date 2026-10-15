@@ -1,12 +1,15 @@
 # tour-lens
 
-An AI tour guide that sees what you see. Point your phone at something during a self-guided
-apartment tour, tap, ask "what's this?", and get a spoken answer from that unit's actual
-records, with the source shown. Not a guess. If the camera and the records disagree, it says so
-and flags it for the leasing team.
+An AI tour guide that sees what you see. During a self-guided apartment tour you point your phone
+at something, tap, and ask about it. It answers out loud from that unit's actual records and shows
+where the answer came from. If what the camera sees doesn't match the records, it says so and
+flags it for the leasing team.
 
-A concept demo I built for my EliseAI product manager application. It extends AI-Guided Tours.
-Not affiliated with EliseAI. The property, units and people are made up.
+I was researching the verticals EliseAI operates in and honestly expected to find this somewhere.
+I didn't, so I built it. It's a concept demo that extends AI-Guided Tours. Not affiliated with
+EliseAI, and the property, units and people are made up.
+
+Also instead of just a prototype, I figured why not a mini launch video that showcases it lol
 
 https://github.com/user-attachments/assets/60fdf31c-f1bf-4836-8c22-4deb8b3e48c0
 
@@ -35,6 +38,17 @@ suggested question can't get through, the app plays a saved real answer and labe
    them, and writes the line shown on screen from the records it cited.
 5. The same model phrases the spoken answer from that briefing only, and Deepgram Aura says it.
 6. Holds run only after you tap Confirm. The recap collects everything for the leasing team.
+
+## What's in the repo
+
+- `worker/`: the API. `records.ts` is the unit's records, `index.ts` decides the facts,
+  `cerebras.ts` and `workers-ai.ts` call the models.
+- `src/`: the phone web app. `Walk.tsx` is the sample tour.
+- `docs/`: the product write-up, research and the demo video.
+- `videos/`: the demo film, made in code with Remotion. `scripts/capture.ts` runs the tour through
+  the live app and saves what it really said.
+- `AGENTS.md`, `docs/agents/`: notes for the AI coding agents I built this with.
+- `tools/oxlint/`: lint rules the code has to pass.
 
 ## Credits
 

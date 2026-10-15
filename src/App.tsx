@@ -79,7 +79,7 @@ export function App() {
       <p className="eyebrow">Self-guided tour</p>
       <h1>Larkspur Commons, Unit 4B</h1>
       <p className="lede">
-        An AI tour guide that sees what you're pointing at. Hold the button and ask about anything in the unit.
+        An AI tour guide that sees what you're pointing at. Tap the button and ask about anything in the unit.
         Answers come from the unit's records, with the source shown.
       </p>
       <form
@@ -260,15 +260,12 @@ function Tour({ code, session }: { code: string; session: Session }) {
         )}
         <button
           className={`talk ${status}`}
-          onPointerDown={press}
-          onPointerUp={() => void release()}
-          onPointerLeave={() => void release()}
-          onContextMenu={(event) => event.preventDefault()}
+          onClick={() => (status === "listening" ? void release() : press())}
           disabled={status === "thinking" || !stream}
         >
           {!stream && "Mic off, tap a question above"}
-          {stream && status === "idle" && "Hold to ask"}
-          {stream && status === "listening" && "Listening"}
+          {stream && status === "idle" && "Tap to ask"}
+          {stream && status === "listening" && "Listening, tap when done"}
           {stream && status === "thinking" && "Checking the records"}
         </button>
         <Footer />

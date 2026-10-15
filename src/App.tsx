@@ -236,14 +236,16 @@ function Tour({ code, session }: { code: string; session: Session }) {
 
       <section className="sheet">
         {status === "thinking" ? (
-          <p className="card thinking" role="status">
-            <span className="dots" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </span>
-            Looking and checking the records
-          </p>
+          <div className="card thinking" role="status">
+            <div className="row">
+              <span className="spinner" aria-hidden="true" />
+              <div>
+                <p className="headline">Thinking</p>
+                <p className="muted">Looking at what you pointed at and checking the records</p>
+              </div>
+            </div>
+            <span className="progress" aria-hidden="true" />
+          </div>
         ) : (
           latest && <Card entry={latest} />
         )}
@@ -280,7 +282,11 @@ function Tour({ code, session }: { code: string; session: Session }) {
           {!stream && "Mic off, tap a question above"}
           {stream && status === "idle" && "Tap to ask"}
           {stream && status === "listening" && "Listening, tap when done"}
-          {stream && status === "thinking" && "Thinking"}
+          {stream && status === "thinking" && (
+            <>
+              <span className="spinner small" aria-hidden="true" /> Thinking
+            </>
+          )}
         </button>
         <Footer />
       </section>

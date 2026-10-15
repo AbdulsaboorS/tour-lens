@@ -16,7 +16,6 @@ https://github.com/user-attachments/assets/60fdf31c-f1bf-4836-8c22-4deb8b3e48c0
 - **Demo video file (1 min):** [docs/media/tour-lens.mp4](docs/media/tour-lens.mp4)
 - **Try it:** https://tour-lens.feedback-signal.workers.dev (access code in my message)
 - **The product write-up:** [docs/writeup.md](docs/writeup.md)
-- **Research:** [docs/research.md](docs/research.md)
 
 ## Try it
 

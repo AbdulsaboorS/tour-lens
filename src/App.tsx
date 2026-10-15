@@ -1,13 +1,30 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 
-import { ask, checkCode, holdUnit, type Citation } from "./api";
-import { createSpeaker, grabFrame, openCamera, startRecording } from "./media";
+import { ask, checkCode, holdUnit, savedAnswer, type Citation } from "./api";
+import { createSpeaker, grabFrame, openCamera, openMic, startRecording } from "./media";
+import { rooms, Walk } from "./Walk";
 
 type Entry =
-  | { kind: "answer"; question: string; seen: string; answer: string; headline: string; citations: Citation[]; mismatches: string[] }
+  | {
+      kind: "answer";
+      question: string;
+      seen: string;
+      answer: string;
+      headline: string;
+      citations: Citation[];
+      mismatches: string[];
+      saved?: boolean;
+    }
   | { kind: "hold"; answer: string; headline: string; citations: Citation[]; holdId: string; expires: string };
 
 type Status = "idle" | "listening" | "thinking";
+
+type Session = {
+  speaker: ReturnType<typeof createSpeaker>;
+  // The sample tour walks photos of the unit. Otherwise the renter is there with the live camera.
+  sample: boolean;
+  stream?: MediaStream;
+};
 
 const CODE_KEY = "tour-lens-code";
 
@@ -21,10 +38,10 @@ function savedCode() {
 
 export function App() {
   const [code, setCode] = useState(savedCode);
-  const [session, setSession] = useState<{ stream: MediaStream; speaker: ReturnType<typeof createSpeaker> }>();
+  const [session, setSession] = useState<Session>();
   const [error, setError] = useState("");
 
-  async function start() {
+  async function start(sample: boolean) {
     setError("");
 
     const speaker = createSpeaker();
@@ -41,33 +58,44 @@ export function App() {
       localStorage.setItem(CODE_KEY, code);
     } catch {}
 
+    if (sample) {
+      // Without a mic the suggested questions still work, so a denied prompt isn't a dead end.
+      setSession({ speaker, sample, stream: await openMic().catch(() => undefined) });
+
+      return;
+    }
+
     try {
-      setSession({ stream: await openCamera(), speaker });
+      setSession({ speaker, sample, stream: await openCamera() });
     } catch {
       setError("Tour Lens needs your camera and microphone to see and hear your questions.");
     }
   }
 
-  if (session) return <Tour code={code} stream={session.stream} speaker={session.speaker} />;
+  if (session) return <Tour code={code} session={session} />;
 
   return (
     <main className="gate">
       <p className="eyebrow">Self-guided tour</p>
       <h1>Larkspur Commons, Unit 4B</h1>
       <p className="lede">
-        Point your camera at anything in the unit and ask. Answers come from this unit's records, with the source
-        shown.
+        An AI tour guide that sees what you're pointing at. Hold the button and ask about anything in the unit.
+        Answers come from the unit's records, with the source shown.
       </p>
       <form
         onSubmit={(event) => {
           event.preventDefault();
-          void start();
+          void start(true);
         }}
       >
         <label htmlFor="code">Tour access code</label>
         <input id="code" value={code} onChange={(event) => setCode(event.target.value)} autoComplete="off" />
         <button className="primary" type="submit" disabled={!code}>
-          Start tour
+          Walk the sample unit
+        </button>
+        <p className="muted small">Photos of a staged unit stand in for your camera. Drag to look around, walk between rooms.</p>
+        <button className="secondary" type="button" disabled={!code} onClick={() => void start(false)}>
+          I'm at the unit, use my camera
         </button>
         {error && <p className="error">{error}</p>}
       </form>
@@ -76,22 +104,32 @@ export function App() {
   );
 }
 
-function Tour({ code, stream, speaker }: { code: string; stream: MediaStream; speaker: ReturnType<typeof createSpeaker> }) {
+function Camera({ stream, grab }: { stream: MediaStream; grab: RefObject<(() => string) | undefined> }) {
   const video = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (video.current) video.current.srcObject = stream;
+
+    grab.current = () => (video.current ? grabFrame(video.current) : "");
+  }, [stream, grab]);
+
+  return <video ref={video} className="camera" autoPlay playsInline muted />;
+}
+
+function Tour({ code, session }: { code: string; session: Session }) {
+  const { speaker, sample, stream } = session;
+  const grab = useRef<() => string>(undefined);
   const stopRecording = useRef<() => Promise<Blob>>(undefined);
   const pressedAt = useRef(0);
+  const [room, setRoom] = useState(rooms[0]);
   const [status, setStatus] = useState<Status>("idle");
   const [entries, setEntries] = useState<Entry[]>([]);
   const [pendingHold, setPendingHold] = useState(false);
   const [showRecap, setShowRecap] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (video.current) video.current.srcObject = stream;
-  }, [stream]);
-
   function press() {
-    if (status !== "idle") return;
+    if (status !== "idle" || !stream) return;
 
     speaker.stop();
     setError("");
@@ -103,7 +141,7 @@ function Tour({ code, stream, speaker }: { code: string; stream: MediaStream; sp
   async function release() {
     const stop = stopRecording.current;
 
-    if (status !== "listening" || !stop || !video.current) return;
+    if (status !== "listening" || !stop) return;
 
     stopRecording.current = undefined;
 
@@ -115,17 +153,31 @@ function Tour({ code, stream, speaker }: { code: string; stream: MediaStream; sp
       return;
     }
 
+    await send({ audio });
+  }
+
+  async function send(input: { audio: Blob } | { question: string }) {
+    speaker.stop();
+    setError("");
     setStatus("thinking");
 
     try {
       const history = entries.flatMap((entry) => (entry.kind === "answer" ? [{ question: entry.question, answer: entry.answer }] : []));
-      const result = await ask(code, audio, grabFrame(video.current), history);
+
+      const result = await ask(code, input, grab.current?.() ?? "", history).catch(async () => {
+        // The free model tiers rate-limit under load. A sample question can fall back to its saved answer.
+        const saved = "question" in input ? await savedAnswer(input.question) : undefined;
+
+        if (!saved) throw new Error("No saved answer for this question");
+
+        return { ...saved, saved: true };
+      });
 
       setEntries((previous) => [...previous, { kind: "answer", ...result }]);
       setPendingHold(result.pendingHold);
       void speaker.play(result.audio);
     } catch {
-      setError("Couldn't get an answer. Try asking again.");
+      setError("The live models are busy. Give it a few seconds and ask again.");
     } finally {
       setStatus("idle");
     }
@@ -154,16 +206,30 @@ function Tour({ code, stream, speaker }: { code: string; stream: MediaStream; sp
 
   return (
     <main className="tour">
-      <video ref={video} className="camera" autoPlay playsInline muted />
+      {sample ? <Walk key={room.id} room={room} grab={grab} /> : stream && <Camera stream={stream} grab={grab} />}
       <header className="topbar">
         <div>
-          <p className="eyebrow light">Self-guided tour</p>
+          <p className="eyebrow light">{sample ? "Sample tour, staged unit" : "Self-guided tour"}</p>
           <p className="unit">Larkspur Commons, 4B</p>
         </div>
         <button className="ghost" onClick={() => setShowRecap(true)} disabled={entries.length === 0}>
           Recap
         </button>
       </header>
+      {sample && (
+        <nav className="rooms">
+          {rooms.map((candidate) => (
+            <button
+              key={candidate.id}
+              className={candidate.id === room.id ? "here" : ""}
+              onClick={() => setRoom(candidate)}
+              disabled={status !== "idle"}
+            >
+              {candidate.label}
+            </button>
+          ))}
+        </nav>
+      )}
 
       <section className="sheet">
         {latest && <Card entry={latest} />}
@@ -183,17 +249,27 @@ function Tour({ code, stream, speaker }: { code: string; stream: MediaStream; sp
           </div>
         )}
         {error && <p className="error">{error}</p>}
+        {sample && status === "idle" && !pendingHold && (
+          <div className="suggestions">
+            {room.suggestions.map((question) => (
+              <button key={question} onClick={() => void send({ question })}>
+                {question}
+              </button>
+            ))}
+          </div>
+        )}
         <button
           className={`talk ${status}`}
           onPointerDown={press}
           onPointerUp={() => void release()}
           onPointerLeave={() => void release()}
           onContextMenu={(event) => event.preventDefault()}
-          disabled={status === "thinking"}
+          disabled={status === "thinking" || !stream}
         >
-          {status === "idle" && "Hold to ask"}
-          {status === "listening" && "Listening"}
-          {status === "thinking" && "Checking the records"}
+          {!stream && "Mic off, tap a question above"}
+          {stream && status === "idle" && "Hold to ask"}
+          {stream && status === "listening" && "Listening"}
+          {stream && status === "thinking" && "Checking the records"}
         </button>
         <Footer />
       </section>
@@ -214,6 +290,7 @@ function Card({ entry }: { entry: Entry }) {
           </p>
         ))}
       <p className="headline">{entry.headline}</p>
+      {entry.kind === "answer" && entry.saved && <p className="muted small">Live models busy, so this is a saved answer from the same app.</p>}
       {entry.kind === "hold" && (
         <a className="apply" href="#apply">
           Start application

@@ -39,15 +39,30 @@ export async function checkCode(code: string) {
   return response.ok;
 }
 
-export async function ask(code: string, audio: Blob, image: string, history: Turn[]) {
+export async function ask(code: string, input: { audio: Blob } | { question: string }, image: string, history: Turn[]) {
   const form = new FormData();
-  const extension = audio.type.includes("mp4") ? "mp4" : "webm";
 
-  form.set("audio", new File([audio], `question.${extension}`, { type: audio.type }));
+  if ("audio" in input) {
+    const extension = input.audio.type.includes("mp4") ? "mp4" : "webm";
+
+    form.set("audio", new File([input.audio], `question.${extension}`, { type: input.audio.type }));
+  } else {
+    form.set("question", input.question);
+  }
+
   form.set("image", image);
   form.set("history", JSON.stringify(history));
 
   return askSchema.parse(await (await post("/api/ask", code, form)).json());
+}
+
+let saved: Promise<Record<string, z.infer<typeof askSchema>>> | undefined;
+
+/** A real answer captured earlier for a sample tour question, for when the free model tiers are busy. */
+export async function savedAnswer(question: string) {
+  saved ??= fetch("/samples/saved.json").then(async (response) => z.record(z.string(), askSchema).parse(await response.json()));
+
+  return (await saved)[question];
 }
 
 export async function holdUnit(code: string) {

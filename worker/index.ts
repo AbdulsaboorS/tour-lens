@@ -53,7 +53,7 @@ function brief(sight: Sight, picked: Route) {
 
 async function ask(request: Request, env: Env) {
   const form = await request.formData();
-  const audio = z.instanceof(File).parse(form.get("audio"));
+  const typed = z.string().min(1).optional().parse(form.get("question") ?? undefined);
   const image = z.string().startsWith("data:image/").parse(form.get("image"));
   const history = historySchema.parse(JSON.parse(z.string().parse(form.get("history"))));
 
@@ -68,7 +68,9 @@ async function ask(request: Request, env: Env) {
     return result;
   }
 
-  const question = await timed("transcribe", transcribe(env.AI, audio));
+  // The sample tour's suggested questions arrive as text, so there's nothing to transcribe.
+  const question = typed ?? (await timed("transcribe", transcribe(env.AI, z.instanceof(File).parse(form.get("audio")))));
+
   const sight = await timed("look", look(env.AI, image, question));
   const picked = await timed("route", route(env.CEREBRAS_API_KEY, question, sight.seen, history.slice(-3)));
   const { briefing, citations, mismatches } = brief(sight, picked);

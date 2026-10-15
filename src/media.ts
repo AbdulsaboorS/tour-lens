@@ -5,6 +5,10 @@ export async function openCamera() {
   });
 }
 
+export async function openMic() {
+  return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+}
+
 export function grabFrame(video: HTMLVideoElement) {
   const canvas = document.createElement("canvas");
   const scale = Math.min(1, 512 / video.videoWidth);

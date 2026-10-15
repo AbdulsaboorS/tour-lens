@@ -8,11 +8,12 @@ and flags it for the leasing team.
 A concept demo I built for my EliseAI product manager application. It extends AI-Guided Tours.
 Not affiliated with EliseAI. The property, units and people are made up.
 
-- **Demo video (1 min):** [docs/media/tour-lens.mp4](docs/media/tour-lens.mp4)
+[![Tour Lens demo: the agent flags that the records list a top-load washer while the camera shows a front-loader](docs/media/preview.gif)](docs/media/tour-lens.mp4)
+
+- **Demo video (1 min, with sound):** [docs/media/tour-lens.mp4](docs/media/tour-lens.mp4)
+- **Try it:** https://tour-lens.feedback-signal.workers.dev (access code in my message)
 - **The product write-up:** [docs/writeup.md](docs/writeup.md)
 - **Research:** [docs/research.md](docs/research.md)
-
-[![Tour Lens demo](docs/media/poster.jpg)](docs/media/tour-lens.mp4)
 
 ## Try it
 

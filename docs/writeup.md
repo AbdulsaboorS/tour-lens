@@ -32,7 +32,7 @@ shows the source. In the demo:
 
 ## The one rule
 
-It only says what the records say. A wrong rent number on a tour isn't a funny AI mistake, it's a
+It only says what the records say. A wrong rent number on a tour would make for a
 trust and compliance problem for the operator.
 
 So the model looks and talks, and code decides the facts. The vision model only says what's in

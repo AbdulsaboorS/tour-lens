@@ -6,6 +6,7 @@ const askSchema = z.object({
   question: z.string(),
   seen: z.string(),
   answer: z.string(),
+  headline: z.string(),
   citations: z.array(citationSchema),
   mismatches: z.array(z.string()),
   pendingHold: z.boolean(),
@@ -15,6 +16,7 @@ const askSchema = z.object({
 const holdSchema = z.object({
   hold: z.object({ id: z.string(), unit: z.string(), expires: z.string() }),
   answer: z.string(),
+  headline: z.string(),
   citations: z.array(citationSchema),
   audio: z.string(),
 });

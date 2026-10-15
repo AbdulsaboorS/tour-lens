@@ -224,13 +224,8 @@ button:disabled {
   overflow-y: auto;
 }
 
-.asked {
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.answer {
-  font: 500 17px/1.4 var(--display);
+.headline {
+  font: 600 22px/1.25 var(--display);
   color: var(--ink);
 }
 
@@ -238,7 +233,7 @@ button:disabled {
   background: var(--alert-soft);
   color: var(--alert);
   border-radius: 8px;
-  padding: 10px;
+  padding: 8px 10px;
   font-size: 14px;
 }
 
@@ -248,14 +243,9 @@ button:disabled {
 }
 
 .sources {
-  list-style: none;
-  padding: 8px 0 0;
-  border-top: 1px solid var(--line);
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 6px;
-  font-size: 12px;
-  color: var(--muted);
 }
 
 .apply {

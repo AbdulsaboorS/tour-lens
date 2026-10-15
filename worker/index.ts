@@ -14,7 +14,7 @@ function brief(sight: Sight, picked: Route) {
     (record.checks ?? []).flatMap((check) => {
       const seen = sight.checks[check.key];
 
-      return seen !== null && seen !== check.expected ? [{ record, claim: check.claim }] : [];
+      return seen !== null && seen !== check.expected ? [{ record, claim: check.claim, fact: check.fact }] : [];
     }),
   );
 
@@ -28,8 +28,11 @@ function brief(sight: Sight, picked: Route) {
   );
 
   const claims = mismatches.map((mismatch) => mismatch.claim);
+  const withheld = mismatches.map((mismatch) => mismatch.fact);
 
-  const lines = cited.map((record) => `${record.title} (${record.source}):\n${record.facts.join("\n")}`);
+  const lines = cited.map(
+    (record) => `${record.title} (${record.source}):\n${record.facts.filter((fact) => !withheld.includes(fact)).join("\n")}`,
+  );
 
   lines.push(
     claims.length > 0
@@ -69,13 +72,14 @@ async function ask(request: Request, env: Env) {
   const sight = await timed("look", look(env.AI, image, question));
   const picked = await timed("route", route(env.CEREBRAS_API_KEY, question, sight.seen, history.slice(-3)));
   const { briefing, citations, mismatches } = brief(sight, picked);
-  const answer = await timed("phrase", phrase(env.CEREBRAS_API_KEY, question, sight.seen, briefing));
+  const { spoken: answer, headline } = await timed("phrase", phrase(env.CEREBRAS_API_KEY, question, sight.seen, briefing));
   const speech = await timed("speak", speak(env.AI, answer));
 
   return Response.json({
     question,
     seen: sight.seen,
     answer,
+    headline,
     citations,
     mismatches,
     pendingHold: picked.wantsHold,
@@ -85,12 +89,13 @@ async function ask(request: Request, env: Env) {
 
 async function hold(env: Env) {
   const expires = new Date(Date.now() + 48 * 60 * 60 * 1000);
-  const until = expires.toLocaleString("en-US", { weekday: "long", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" });
-  const answer = `Done. Unit ${building.tourUnit} is held for you until ${until}, no deposit. Your application link is on screen.`;
+  const answer = `Done. Unit ${building.tourUnit} is held for you for 48 hours, no deposit. Your application link is on screen.`;
+  const headline = `${building.tourUnit} held for 48 hours`;
 
   return Response.json({
     hold: { id: `H-${crypto.randomUUID().slice(0, 6).toUpperCase()}`, unit: building.tourUnit, expires: expires.toISOString() },
     answer,
+    headline,
     citations: records.flatMap(({ id, title, source }) => (id === "unit.hold" ? [{ id, title, source }] : [])),
     audio: toBase64(await speak(env.AI, answer)),
   });

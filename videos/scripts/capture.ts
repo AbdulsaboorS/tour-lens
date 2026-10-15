@@ -96,6 +96,7 @@ for (const stop of stops) {
     question: result.question,
     seen: result.seen,
     answer: result.answer,
+    headline: result.headline,
     citations: result.citations,
     mismatches: result.mismatches,
     pendingHold: result.pendingHold,

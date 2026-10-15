@@ -4,8 +4,8 @@ import { ask, checkCode, holdUnit, type Citation } from "./api";
 import { createSpeaker, grabFrame, openCamera, startRecording } from "./media";
 
 type Entry =
-  | { kind: "answer"; question: string; seen: string; answer: string; citations: Citation[]; mismatches: string[] }
-  | { kind: "hold"; answer: string; citations: Citation[]; holdId: string; expires: string };
+  | { kind: "answer"; question: string; seen: string; answer: string; headline: string; citations: Citation[]; mismatches: string[] }
+  | { kind: "hold"; answer: string; headline: string; citations: Citation[]; holdId: string; expires: string };
 
 type Status = "idle" | "listening" | "thinking";
 
@@ -140,7 +140,7 @@ function Tour({ code, stream, speaker }: { code: string; stream: MediaStream; sp
 
       setEntries((previous) => [
         ...previous,
-        { kind: "hold", answer: result.answer, citations: result.citations, holdId: result.hold.id, expires: result.hold.expires },
+        { kind: "hold", answer: result.answer, headline: result.headline, citations: result.citations, holdId: result.hold.id, expires: result.hold.expires },
       ]);
       void speaker.play(result.audio);
     } catch {
@@ -170,7 +170,7 @@ function Tour({ code, stream, speaker }: { code: string; stream: MediaStream; sp
         {pendingHold && (
           <div className="confirm">
             <p>
-              <strong>Hold Unit 4B for 48 hours?</strong> Free, no deposit. It comes off the market while you apply.
+              <strong>Hold 4B for 48 hours?</strong> Free, no deposit.
             </p>
             <div className="row">
               <button className="primary" onClick={() => void confirmHold()}>
@@ -203,30 +203,30 @@ function Tour({ code, stream, speaker }: { code: string; stream: MediaStream; sp
   );
 }
 
+// The voice gives the full answer, so the card only shows the gist and where it came from.
 function Card({ entry }: { entry: Entry }) {
   return (
     <article className="card">
-      {entry.kind === "answer" && <p className="asked">"{entry.question}"</p>}
       {entry.kind === "answer" &&
         entry.mismatches.map((mismatch) => (
           <p key={mismatch} className="mismatch">
-            <span className="tag">Records mismatch</span> {mismatch} Flagged for the leasing team.
+            <span className="tag">Flagged</span> {mismatch}
           </p>
         ))}
-      <p className="answer">{entry.answer}</p>
+      <p className="headline">{entry.headline}</p>
       {entry.kind === "hold" && (
         <a className="apply" href="#apply">
-          Start application for 4B
+          Start application
         </a>
       )}
       {entry.citations.length > 0 && (
-        <ul className="sources">
+        <p className="sources">
           {entry.citations.map((citation) => (
-            <li key={citation.id}>
-              <span className="tag">{citation.title}</span> {citation.source}
-            </li>
+            <span key={citation.id} className="tag" title={citation.source}>
+              {citation.title}
+            </span>
           ))}
-        </ul>
+        </p>
       )}
     </article>
   );

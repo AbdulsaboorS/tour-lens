@@ -5,6 +5,8 @@ export type VisualCheck = {
   question: string;
   expected: boolean;
   claim: string;
+  /** The fact this check verifies, withheld from the agent when the camera contradicts it. */
+  fact: string;
 };
 
 export type PropertyRecord = {
@@ -38,6 +40,7 @@ export const records: PropertyRecord[] = [
         question: "Washing machine in frame with a readable brand: true if the brand is LG, false if it's another brand.",
         expected: true,
         claim: "The spec sheet lists an LG washer.",
+        fact: "LG WM3400CW washer, 4.5 cu ft, installed 2023.",
       },
     ],
   },

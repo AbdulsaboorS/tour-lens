@@ -3,5 +3,5 @@ Not for the final film.
 
 - washer.jpg: "Samsung washing and dry machine.jpg", CC0
 - window.jpg: "SPb, Bolshoi Prospekt P.S. 18 - second yard, view from stair window", CC BY-SA 4.0
-- living-room.jpg: "Cozy living room with a gray sofa.jpg"
+- living-room.jpg: "Cozy living room with a gray sofa.jpg" by Shixart1985, CC BY 2.0
 - desk.jpg: "Brown and beige, Computer desk, Rostov-on-Don, Russia.jpg", CC BY 4.0

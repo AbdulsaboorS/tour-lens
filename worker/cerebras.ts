@@ -80,16 +80,29 @@ export async function route(key: string, question: string, seen: string, history
   return routeSchema.parse(JSON.parse(await complete(key, request)));
 }
 
+const phraseSchema = z.strictObject({
+  spoken: z.string(),
+  headline: z.string(),
+});
+
+const { $schema: _phraseSchema, ...phraseJsonSchema } = z.toJSONSchema(phraseSchema);
+
+const noDashes = (text: string) => text.replaceAll(" \u2014 ", ", ").replaceAll("\u2014", ", ");
+
 export async function phrase(key: string, question: string, seen: string, briefing: string) {
   const request = JSON.stringify({
     model: MODEL,
     reasoning_effort: "low",
+    response_format: {
+      type: "json_schema",
+      json_schema: { name: "phrase", strict: true, schema: phraseJsonSchema },
+    },
     messages: [
       {
         role: "system",
         content: [
           "You are the voice of a self-guided apartment tour, talking to a renter standing in Unit 4B.",
-          "Answer the question they actually asked, out loud, in at most two short sentences, under 40 words total.",
+          "spoken: answer the question they actually asked, out loud, in at most two short sentences, under 40 words total.",
           "Every fact in the briefing is true. Answer only from it, including facts about other units.",
           "Quote numbers exactly as written. Never add a number, brand, price or policy that isn't in the briefing.",
           "Don't do math and don't judge whether something fits. Give the measurement and let the renter compare.",
@@ -97,16 +110,14 @@ export async function phrase(key: string, question: string, seen: string, briefi
           "If the briefing has a mismatch that isn't none, lead with it, like this: The records list an LG washer here, but this one looks different, so I've flagged it for the leasing team.",
           "Only if no briefing fact answers the question, say the records don't cover it and offer to text the leasing team.",
           "Plain spoken sentences. No lists, no markdown, no greetings.",
+          "headline: the answer's gist for the screen, at most 6 words, no period, like Pods OK, HE detergent only or Staging only, 14 ft 2 in by 12 ft 8 in. Same facts as spoken, nothing new. Leave the mismatch out of it, the screen shows that separately.",
         ].join(" "),
       },
       { role: "user", content: `Camera sees: ${seen}\nRenter asks: ${question}\n\n${briefing}` },
     ],
   });
 
-  const text = (await complete(key, request)).replaceAll(" \u2014 ", ", ").replaceAll("\u2014", ", ");
+  const { spoken, headline } = phraseSchema.parse(JSON.parse(await complete(key, request)));
 
-  // gpt-oss sometimes returns two drafts back to back. The prompt asks for two sentences, so keep two.
-  const sentences = new Set((text.match(/[^.!?]+[.!?]+/g) ?? [text]).map((sentence) => sentence.trim()));
-
-  return [...sentences].slice(0, 2).join(" ");
+  return { spoken: noDashes(spoken), headline: noDashes(headline) };
 }

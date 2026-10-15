@@ -7,9 +7,9 @@ import { cues } from "../src/videos/tour/cues";
 const s = (seconds: number) => `${seconds.toFixed(1)} s`;
 
 const rows = [
-  ["0.0 s", "Opening", "\"Point. Ask. Get the real answer.\" lands word by word; the phone rises in on the washer."],
+  ["0.0 s", "Opening", "\"An AI tour guide that answers your questions, live.\" lands word by word; the phone rises in on the washer."],
   ...cues.stops.flatMap((stop) => [
-    [s(stop.press), stop.data.id, `Renter asks: "${stop.data.question}"`],
+    [s(stop.press), stop.data.id, `Renter asks: "${stop.data.asked}"`],
     [s(stop.answer), "", `Answer (${stop.data.responseSeconds} s live): "${stop.data.answer}"`],
     ...(stop.data.mismatches.length > 0 ? [[s(stop.answerEnd + 0.2), "", "\"It noticed the records were wrong.\""]] : []),
     ...(stop.confirm !== undefined ? [[s(stop.confirm), "", "Tap Confirm hold"]] : []),
@@ -17,7 +17,7 @@ const rows = [
   ]),
   [s(cues.recap), "Recap", "Tap Recap; the leasing team recap slides up."],
   [s(cues.how), "How it works", "\"The model looks and talks. Code decides the facts.\""],
-  [s(cues.close), "End card", "\"Real responses from the working prototype.\" Not affiliated line, repo URL."],
+  [s(cues.close), "End card", "\"Your AI tour guide.\" Credit to Abdulsaboor Shaikh, real-responses and not-affiliated line, repo URL."],
   [s(cues.duration), "End", ""],
 ];
 

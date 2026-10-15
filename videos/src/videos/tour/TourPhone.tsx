@@ -1,6 +1,6 @@
 import { Easing, Img, staticFile } from "remotion";
 
-import { clamp01, progress } from "../../kit/time";
+import { progress } from "../../kit/time";
 import capture from "./capture.json";
 import { cues, stopAt, type Captured } from "./cues";
 
@@ -43,31 +43,15 @@ function Tap({ t, at, lift }: { t: number; at: number; lift: number }) {
   );
 }
 
-/** Words fill in at speaking pace, each keeping its slot so the card never reflows. */
-function Spoken({ text, start, length, t }: { text: string; start: number; length: number; t: number }) {
-  const words = text.split(" ");
-  const shown = Math.floor(clamp01((t - start) / length) * words.length + 1);
-
+function Sources({ citations }: { citations: Citation[] }) {
   return (
-    <p className="answer">
-      {words.map((word, index) => (
-        <span key={index} style={{ opacity: index < shown ? 1 : 0.18 }}>
-          {word}{" "}
+    <p className="sources">
+      {citations.map((citation) => (
+        <span key={citation.id} className="tag">
+          {citation.title}
         </span>
       ))}
     </p>
-  );
-}
-
-function Sources({ citations }: { citations: Citation[] }) {
-  return (
-    <ul className="sources">
-      {citations.map((citation) => (
-        <li key={citation.id}>
-          <span className="tag">{citation.title}</span> {citation.source}
-        </li>
-      ))}
-    </ul>
   );
 }
 
@@ -76,13 +60,12 @@ function AnswerCard({ data, t, start }: { data: Captured; t: number; start: numb
 
   return (
     <article className="card" style={{ opacity: enter, translate: `0 ${(1 - enter) * 18}px` }}>
-      <p className="asked">"{data.question}"</p>
       {data.mismatches.map((mismatch) => (
         <p key={mismatch} className="mismatch">
-          <span className="tag">Records mismatch</span> {mismatch} Flagged for the leasing team.
+          <span className="tag">Flagged</span> {mismatch}
         </p>
       ))}
-      <Spoken text={data.answer} start={start} length={data.answerSeconds} t={t} />
+      <p className="headline">{data.headline}</p>
       <Sources citations={data.citations} />
     </article>
   );
@@ -93,25 +76,46 @@ function HoldCard({ t, start }: { t: number; start: number }) {
 
   return (
     <article className="card" style={{ opacity: enter, translate: `0 ${(1 - enter) * 18}px` }}>
-      <Spoken text={capture.hold.answer} start={start} length={capture.hold.answerSeconds} t={t} />
-      <a className="apply">Start application for 4B</a>
+      <p className="headline">{capture.hold.headline}</p>
+      <a className="apply">Start application</a>
       <Sources citations={capture.hold.citations} />
     </article>
   );
+}
+
+/**
+ * The feed is a still photo, so fake a handheld phone: each new stop starts wide and off target,
+ * pushes in toward the object while the renter walks up, then settles with a slight sway.
+ */
+function handheld(t: number, stop: (typeof cues.stops)[number], continuing: boolean) {
+  const approach = continuing ? 1 : ease(progress(t, stop.enter, stop.press - stop.enter + 0.8));
+  const sway = 1 - approach * 0.5;
+
+  const scale = 1.04 + 0.16 * approach;
+  const x = (1 - approach) * 4 + Math.sin(t * 1.3) * 0.6 * sway;
+  const y = (1 - approach) * 3 + Math.cos(t * 1.7) * 0.5 * sway + Math.sin(t * 7) * 0.4 * (1 - approach);
+  const rotate = Math.sin(t * 0.9) * 0.5 * sway;
+
+  return { scale: String(scale), translate: `${x}% ${y}%`, rotate: `${rotate}deg` };
 }
 
 function Feed({ t }: { t: number }) {
   const stop = stopAt(t);
   const index = cues.stops.indexOf(stop);
   const previous = cues.stops[index - 1];
-  const slide = previous && previous.data.photo !== stop.data.photo ? ease(progress(t, stop.enter, 0.6)) : 1;
+  const continuing = previous !== undefined && previous.data.photo === stop.data.photo;
+  const slide = previous && !continuing ? ease(progress(t, stop.enter, 0.6)) : 1;
 
   return (
     <>
       {previous && slide < 1 && (
-        <Img className="camera" src={staticFile(`stops/${previous.data.photo}`)} style={{ translate: `${-slide * 100}% 0` }} />
+        <div className="camera" style={{ translate: `${-slide * 100}% 0`, overflow: "hidden" }}>
+          <Img className="camera" src={staticFile(`stops/${previous.data.photo}`)} style={handheld(t, previous, true)} />
+        </div>
       )}
-      <Img className="camera" src={staticFile(`stops/${stop.data.photo}`)} style={{ translate: `${(1 - slide) * 100}% 0` }} />
+      <div className="camera" style={{ translate: `${(1 - slide) * 100}% 0`, overflow: "hidden" }}>
+        <Img className="camera" src={staticFile(`stops/${stop.data.photo}`)} style={handheld(t, stop, continuing)} />
+      </div>
     </>
   );
 }
@@ -158,7 +162,7 @@ function Recap({ t }: { t: number }) {
           {asked.map((data) => (
             <li key={data.id}>
               <p className="mono">Pointed at {data.seen}</p>
-              <p>"{data.question}"</p>
+              <p>"{data.asked}"</p>
               <p className="muted">Answered from {data.citations.map((citation) => citation.title).join(", ")}</p>
             </li>
           ))}
@@ -203,7 +207,7 @@ export function TourPhone({ t }: { t: number }) {
         {pendingHold && (
           <div className="confirm">
             <p>
-              <strong>Hold Unit 4B for 48 hours?</strong> Free, no deposit. It comes off the market while you apply.
+              <strong>Hold 4B for 48 hours?</strong> Free, no deposit.
             </p>
             <div className="row">
               <button className="primary" style={{ position: "relative" }}>

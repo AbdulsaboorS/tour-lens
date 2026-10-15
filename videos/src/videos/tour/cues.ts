@@ -56,7 +56,7 @@ function plan() {
       stops.push({ data, enter, press, release, answer, answerEnd, confirm, done, doneEnd, end: onBeat(doneEnd + 0.8) });
     } else {
       // The mismatch gets a beat of its own for the punchline.
-      const linger = data.mismatches.length > 0 ? 3.2 : 0.9;
+      const linger = data.mismatches.length > 0 ? 3 : 0.7;
 
       stops.push({ data, enter, press, release, answer, answerEnd, end: onBeat(answerEnd + linger) });
     }
@@ -65,9 +65,9 @@ function plan() {
   }
 
   const recap = cursor;
-  const how = onBeat(recap + 5);
-  const close = onBeat(how + 5.5);
-  const bars = Math.ceil((close + 5) / (beat * grid.beatsPerBar));
+  const how = onBeat(recap + 3.6);
+  const close = onBeat(how + 3.2);
+  const bars = Math.ceil((close + 4.2) / (beat * grid.beatsPerBar));
 
   return { stops, recap, how, close, duration: bars * beat * grid.beatsPerBar };
 }

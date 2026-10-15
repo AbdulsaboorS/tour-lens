@@ -31,13 +31,13 @@ function punchlines(layout: Layout): Card[] {
 
   const opening: Card = {
     lines: [
-      [{ text: "Point.", at: b(1, 1) }, { text: "Ask.", at: b(1, 2) }],
-      [{ text: "Get the", at: b(1, 3) }],
-      [{ text: "real answer.", at: b(1, 4), accent: true }],
+      [{ text: "An AI", at: b(1, 1) }, { text: "tour guide", at: b(1, 1, 0.5) }],
+      [{ text: "that answers", at: b(1, 2) }, { text: "your", at: b(1, 2, 0.5) }],
+      [{ text: "questions,", at: b(1, 3) }, { text: "live.", at: b(1, 3, 0.5), accent: true }],
     ],
     out: wide ? firstStop.release : firstStop.enter - 0.1,
     y: wide ? 540 : 960,
-    size: wide ? 88 : 112,
+    size: wide ? 76 : 100,
   };
 
   if (!mismatchStop) return [opening];
@@ -85,7 +85,7 @@ function Caption({ t, layout }: { t: number; layout: Layout }) {
       }}
     >
       <p style={{ font: `500 22px/1 ${fonts.mono}`, letterSpacing: "0.08em", color: color.lavender }}>RENTER ASKS</p>
-      <p style={{ font: `500 ${wide ? 46 : 52}px/1.2 ${fonts.display}`, color: color.white, letterSpacing: "-0.01em" }}>"{stop.data.question}"</p>
+      <p style={{ font: `500 ${wide ? 46 : 52}px/1.2 ${fonts.display}`, color: color.white, letterSpacing: "-0.01em" }}>"{stop.data.asked}"</p>
       <p style={{ font: `500 22px/1.4 ${fonts.mono}`, color: color.muted, opacity: badge, marginTop: 6 }}>
         Answered live in {stop.data.responseSeconds} s. Wait trimmed.
       </p>
@@ -96,9 +96,8 @@ function Caption({ t, layout }: { t: number; layout: Layout }) {
 function HowItWorks({ t }: { t: number }) {
   if (t < cues.how - 0.1 || t > cues.close + 0.3) return null;
 
-  const enter = ease(progress(t, cues.how, 0.5));
-  const second = ease(progress(t, cues.how + 0.8, 0.5));
-  const detail = ease(progress(t, cues.how + 1.6, 0.5));
+  const enter = ease(progress(t, cues.how, 0.4));
+  const second = ease(progress(t, cues.how + 0.6, 0.4));
   const leave = progress(t, cues.close - 0.3, 0.3);
 
   return (
@@ -109,23 +108,31 @@ function HowItWorks({ t }: { t: number }) {
       <p style={{ font: `600 84px/1.1 ${fonts.display}`, color: color.lavender, opacity: second, translate: `0 ${(1 - second) * 30}px` }}>
         Code decides the facts.
       </p>
-      <p style={{ font: `500 26px/1.5 ${fonts.mono}`, color: color.muted, letterSpacing: "0.04em", opacity: detail, marginTop: 20 }}>
-        CAMERA + QUESTION → THE UNIT'S RECORDS → ANSWER WITH SOURCES
-      </p>
     </AbsoluteFill>
   );
 }
 
 function EndCard({ t }: { t: number }) {
   const enter = ease(progress(t, cues.close, 0.6));
+  const credit = ease(progress(t, cues.close + 0.9, 0.5));
 
   if (enter === 0) return null;
 
   return (
-    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", gap: 22, opacity: enter, textAlign: "center", padding: 80 }}>
-      <p style={{ font: `600 64px/1.15 ${fonts.display}`, color: color.white }}>Real responses from the working prototype.</p>
-      <p style={{ font: `500 30px/1.4 ${fonts.body}`, color: color.muted }}>Concept demo, not affiliated with EliseAI.</p>
-      <p style={{ font: `500 26px/1 ${fonts.mono}`, color: color.lavender, marginTop: 24 }}>github.com/AbdulsaboorS/tour-lens</p>
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", gap: 22, textAlign: "center", padding: 80 }}>
+      <p style={{ font: `600 96px/1.1 ${fonts.display}`, color: color.white, opacity: enter, translate: `0 ${(1 - enter) * 30}px` }}>
+        Your AI tour guide.
+      </p>
+      <p style={{ font: `500 44px/1.3 ${fonts.display}`, color: color.lavender, opacity: enter }}>
+        It sees what you see, and answers from the records.
+      </p>
+      <div style={{ opacity: credit, marginTop: 48, display: "flex", flexDirection: "column", gap: 16 }}>
+        <p style={{ font: `500 34px/1.3 ${fonts.body}`, color: color.white }}>A prototype by Abdulsaboor Shaikh for EliseAI</p>
+        <p style={{ font: `500 22px/1.4 ${fonts.mono}`, color: color.muted, letterSpacing: "0.04em" }}>
+          REAL RESPONSES FROM THE WORKING APP · NOT AFFILIATED WITH ELISEAI
+        </p>
+        <p style={{ font: `500 22px/1 ${fonts.mono}`, color: color.muted }}>github.com/AbdulsaboorS/tour-lens</p>
+      </div>
     </AbsoluteFill>
   );
 }

@@ -144,6 +144,7 @@ function Tour({ code, session }: { code: string; session: Session }) {
     if (status !== "listening" || !stop) return;
 
     stopRecording.current = undefined;
+    setStatus("thinking");
 
     const audio = await stop();
 
@@ -232,7 +233,18 @@ function Tour({ code, session }: { code: string; session: Session }) {
       )}
 
       <section className="sheet">
-        {latest && <Card entry={latest} />}
+        {status === "thinking" ? (
+          <p className="card thinking" role="status">
+            <span className="dots" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
+            Looking and checking the records
+          </p>
+        ) : (
+          latest && <Card entry={latest} />
+        )}
         {pendingHold && (
           <div className="confirm">
             <p>
@@ -266,7 +278,7 @@ function Tour({ code, session }: { code: string; session: Session }) {
           {!stream && "Mic off, tap a question above"}
           {stream && status === "idle" && "Tap to ask"}
           {stream && status === "listening" && "Listening, tap when done"}
-          {stream && status === "thinking" && "Checking the records"}
+          {stream && status === "thinking" && "Thinking"}
         </button>
         <Footer />
       </section>
